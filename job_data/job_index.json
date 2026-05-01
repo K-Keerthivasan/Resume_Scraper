@@ -1,34 +1,474 @@
 {
-  "jk:05f35984b5f1dad2": {
-    "company": "Midnight Marketing",
-    "file": "job_data/jobs_2026-04-29.csv",
+  "jk:01f7be3f5b8fd6bb": {
+    "company": "TVB",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Content Creator & Brand Growth Support",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=01f7be3f5b8fd6bb"
+  },
+  "jk:064c5fbcc337acc5": {
+    "company": "Xtract One Technologies",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Associate Software Engineer",
+    "location": "55 York Street, Toronto, ON M5J 1R7",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=064c5fbcc337acc5"
+  },
+  "jk:077257d66b48e18e": {
+    "company": "Robert Half",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Technical Support Analyst",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=077257d66b48e18e"
+  },
+  "jk:0cc44fc67d8633b2": {
+    "company": "APPTOZA INC.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Front End Developer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=0cc44fc67d8633b2"
+  },
+  "jk:16828c615693c075": {
+    "company": "Burnout Brands",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "IT Helpdesk Technician",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=16828c615693c075"
+  },
+  "jk:1d019bd65240e5d2": {
+    "company": "Robert Half",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Web Developer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=1d019bd65240e5d2"
+  },
+  "jk:250c04f446e9bf60": {
+    "company": "J Dass",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Social Media Influencer",
+    "location": "370 New Enterprise Way, Vaughan, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=250c04f446e9bf60"
+  },
+  "jk:26a59262266864d6": {
+    "company": "Blue & Green Inc",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Graphic Designer and web developer",
+    "location": "4665 Yonge Street, North York, ON M2N 0B4",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=26a59262266864d6"
+  },
+  "jk:27ebc6bd93946813": {
+    "company": "Gatekeeper Systems Inc",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Software Test Engineer",
+    "location": "31127 Wheel Avenue, Abbotsford, BC V2T 6H1",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=27ebc6bd93946813"
+  },
+  "jk:367da12a718c3a92": {
+    "company": "OneUp Holdings",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Social Media Content Coordinator",
+    "location": "2220 Midland Avenue, Scarborough, ON M1P 3E6",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=367da12a718c3a92"
+  },
+  "jk:3ba5701205f290de": {
+    "company": "Atlantis IT group",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "React JS Developer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=3ba5701205f290de"
+  },
+  "jk:3e0049c984e2687e": {
+    "company": "Woodbine GM",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Content Creator",
+    "location": "4504 Blackfoot Tr SE, Calgary, AB T2G 4E9",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=3e0049c984e2687e"
+  },
+  "jk:43151f1ef3c084f4": {
+    "company": "Elite Digital Inc.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Digital Designer - Freelance",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=43151f1ef3c084f4"
+  },
+  "jk:436273fb37c33f8a": {
+    "company": "East End United Regional Ministry",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Website Designer and Communications Assistant",
+    "location": "310 Danforth Avenue, Toronto, ON M4K 1N6",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=436273fb37c33f8a"
+  },
+  "jk:48261da1c32ce4f0": {
+    "company": "SIS Consulting",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Technical Analyst \u2013 Client Support & Infrastructure",
+    "location": "349 Carlaw Avenue, Toronto, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=48261da1c32ce4f0"
+  },
+  "jk:489c6f3e6fd29839": {
+    "company": "Esiance",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Full Stack Web Application Developer",
+    "location": "250 Consumers Road, North York, ON M2J 4V6",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=489c6f3e6fd29839"
+  },
+  "jk:4b8bfb835d924556": {
+    "company": "Eco Choice Windows & Doors",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Content Creator - Video & Digital",
+    "location": "90 Basaltic Rd, Concord, ON L4K 1G6",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=4b8bfb835d924556"
+  },
+  "jk:4d163a58ce250716": {
+    "company": "Sequoia Software",
+    "file": "job_data/jobs_2026-05-01.csv",
     "job_title": "Welcome, Keerthivasan",
     "location": "Unknown Location",
-    "scraped_at": "2026-04-29",
-    "source_url": "https://ca.indeed.com/viewjob?jk=05f35984b5f1dad2"
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=4d163a58ce250716"
   },
-  "jk:52c58962ad9b0f7a": {
-    "company": "XO Homes Inc.",
-    "file": "job_data/jobs_2026-04-29.csv",
-    "job_title": "Welcome, Keerthivasan",
-    "location": "21556 Richmond St, Arva, ON",
-    "scraped_at": "2026-04-29",
-    "source_url": "https://ca.indeed.com/viewjob?jk=52c58962ad9b0f7a"
+  "jk:557b13040ff02166": {
+    "company": "Chexy",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Full Stack Engineer",
+    "location": "2 Berkeley St Ste 301, Toronto, ON M5A 4J6",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=557b13040ff02166"
   },
-  "jk:f85e6b9fa676c4cc": {
-    "company": "Outlier Ai",
-    "file": "job_data/jobs_2026-04-29.csv",
-    "job_title": "Job Search Canada | Indeed",
+  "jk:62bd842937b247e5": {
+    "company": "First National Financial",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "IT Service Desk Specialist",
+    "location": "100 University Ave Suite 700, Toronto, ON M5J 1V6",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=62bd842937b247e5"
+  },
+  "jk:62db61d8f9a16a86": {
+    "company": "Designfusion",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Junior Web Designer & Content Creator",
+    "location": "305 Milner Avenue, Scarborough, ON M1B 3V4",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=62db61d8f9a16a86"
+  },
+  "jk:64cc427f5feea7e2": {
+    "company": "Superior Radiant Products",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "IT Specialist",
+    "location": "563 Barton Street, Stoney Creek, ON L8E 5S1",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=64cc427f5feea7e2"
+  },
+  "jk:7656cfd4e0ac1f2d": {
+    "company": "Sunnybrook Health Sciences Centre",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Web Communications Specialist - Public Affair Web - Regular Full-Time 2026-17230",
+    "location": "2075 Bayview Ave, Toronto, ON M4N 3M5",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=7656cfd4e0ac1f2d"
+  },
+  "jk:7b1467e6ffcba85f": {
+    "company": "Martell Ventures",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Videographer",
     "location": "Unknown Location",
-    "scraped_at": "2026-04-29",
-    "source_url": "https://ca.indeed.com/?from=gnav-passport--passport-webapp"
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=7b1467e6ffcba85f"
   },
-  "jk:f98ab211b45a264c": {
-    "company": "General Dynamics Land Systems",
-    "file": "job_data/jobs_2026-04-29.csv",
-    "job_title": "Welcome, Keerthivasan",
-    "location": "1991 Oxford Street East, London, ON N5V 2Z7",
-    "scraped_at": "2026-04-29",
-    "source_url": "https://ca.indeed.com/?from=gnav-passport--passport-webapp"
+  "jk:7b59ee83f5bb7d90": {
+    "company": "Sobeys",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Specialist Creative Design - 4 month contract",
+    "location": "364 Richmond Street West, Toronto, ON M5V 1X6",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=7b59ee83f5bb7d90"
+  },
+  "jk:869f6754fc92cb1c": {
+    "company": "Staff Plus",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Web/App Developer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=869f6754fc92cb1c"
+  },
+  "jk:86c3738486fd5a5e": {
+    "company": "Capital Gear Ltd",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Marketing Specialist (Design-Focused)",
+    "location": "17303 116th Avenue NW, Edmonton, AB T5S 2P7",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=86c3738486fd5a5e"
+  },
+  "jk:88c58b9e0fb5fa51": {
+    "company": "The Credit Counselling Society",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Content Creation Specialist",
+    "location": "625 Agnes St, New Westminster, BC V3M 5Y4",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=88c58b9e0fb5fa51"
+  },
+  "jk:8a334ec21b3c64ab": {
+    "company": "Obsidian Group Inc.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Multimedia Brand Designer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=8a334ec21b3c64ab"
+  },
+  "jk:8a42ce594ee831a0": {
+    "company": "Optimum HR Solutions",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Junior Graphic Designer",
+    "location": "Uxbridge, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=8a42ce594ee831a0"
+  },
+  "jk:91c8205cea03575c": {
+    "company": "Scalable Systems",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Guidewire Dev/BSA/Manager",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=91c8205cea03575c"
+  },
+  "jk:9a4a306451fbcb43": {
+    "company": "eMacity Leads",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Web designer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=9a4a306451fbcb43"
+  },
+  "jk:9a5e9b4f93646346": {
+    "company": "Rallye",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "IT Technician",
+    "location": "Moncton, NB E1C 0K4",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=9a5e9b4f93646346"
+  },
+  "jk:9c454efd1e5d881c": {
+    "company": "Tempho inc.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Senior AI UI/UX Designer & Front-End Design Engineer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=9c454efd1e5d881c"
+  },
+  "jk:a7122c9410fa8f99": {
+    "company": "Recutify Inc.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Full Stack Developer - Front end UI (Vue.JS and Angular.. Design thinking and Azure)",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=a7122c9410fa8f99"
+  },
+  "jk:a7dc0a1a0923c71a": {
+    "company": "Prenuvo",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Enterprise Application Administrator",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=a7dc0a1a0923c71a"
+  },
+  "jk:ade8654a3c6d7536": {
+    "company": "Confidential",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "IT TECHNICAL SUPPORT ANALYST",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=ade8654a3c6d7536"
+  },
+  "jk:b40ae4dd64ed99ce": {
+    "company": "Cube Packaging Solutions",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Marketing Specialist",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=b40ae4dd64ed99ce"
+  },
+  "jk:b6745fbfa45aedd2": {
+    "company": "Robert Half",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Web Developer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=b6745fbfa45aedd2"
+  },
+  "jk:b995c471a07c6dc4": {
+    "company": "Mr. Lawnmower Landscaping Services Ltd.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Graphic Design Intern (Website Revamp)",
+    "location": "8871 Sheppard Avenue East, Scarborough, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=b995c471a07c6dc4"
+  },
+  "jk:bb008a89f620577f": {
+    "company": "EthosVisuals",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Content Creator / Videographer & Editor",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=bb008a89f620577f"
+  },
+  "jk:c30b036796c39f84": {
+    "company": "Purolator Inc",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Front-End Software Developer",
+    "location": "2727 Meadowpine Boulevard, Mississauga, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=c30b036796c39f84"
+  },
+  "jk:c49281e5af960320": {
+    "company": "Manitoba Blue Cross",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Social Media Coordinator",
+    "location": "599 Empress St, Winnipeg, MB R3G 3P3",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=c49281e5af960320"
+  },
+  "jk:c8816a6fb58d0d2c": {
+    "company": "FSH Design",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Social Media Specialist",
+    "location": "150 King Street West, Toronto, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=c8816a6fb58d0d2c"
+  },
+  "jk:c9d0809b48415b14": {
+    "company": "Micro-Vision Computers",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Computer Specialist",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=c9d0809b48415b14"
+  },
+  "jk:ca8f3c1bd0047dde": {
+    "company": "Smartt Inc.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Junior IT Service Technician (Tier 1)",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=ca8f3c1bd0047dde"
+  },
+  "jk:cf85dffa65fcf5e6": {
+    "company": "BILTON WELDING and MANUFACTURING LTD.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "IT Systems Administrator - In Innisfail Alberta",
+    "location": "5815 37 Street, Innisfail, AB T4G 1S8",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=cf85dffa65fcf5e6"
+  },
+  "jk:d4c0e5af6cadcb84": {
+    "company": "KNB Communications, LLC",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Digital Marketing + SEO Specialist, marcom agency (remote)",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=d4c0e5af6cadcb84"
+  },
+  "jk:d560d21cc399b888": {
+    "company": "Ekxpert Placement Services",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Full Stack Developer",
+    "location": "8800 Dufferin St, Concord, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=d560d21cc399b888"
+  },
+  "jk:d7ca9f0f850c4268": {
+    "company": "Look Good Feel Better",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Photographer & Videographer",
+    "location": "150 Eglinton Avenue East, Toronto, ON",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=d7ca9f0f850c4268"
+  },
+  "jk:dccc9ecde771d8dc": {
+    "company": "Prolex Media",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Videographer & Editor",
+    "location": "93 Lombard Avenue, Winnipeg, MB R3B 3B1",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=dccc9ecde771d8dc"
+  },
+  "jk:e07d18cd2547f1f2": {
+    "company": "Coalition of Black Small & Medium Enterprises",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Communications & Program Specialist",
+    "location": "10 Research Drive, Regina, SK S4S 7J7",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=e07d18cd2547f1f2"
+  },
+  "jk:f81a090389062936": {
+    "company": "idig Marketing",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Digital Marketing Intern (Content Design & AI Research)",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=f81a090389062936"
+  },
+  "jk:f8e637db0c2a29ba": {
+    "company": "Brave Academy Inc",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Social Media Manager / Videographer",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=f8e637db0c2a29ba"
+  },
+  "jk:f9981267e910ecfb": {
+    "company": "CCS Creative",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Digital Marketing & Web Content Specialist",
+    "location": "4023 Chesswood Drive, North York, ON M3J 2R8",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=f9981267e910ecfb"
+  },
+  "jk:fbd7839cb235dae9": {
+    "company": "Roots & Tales Clinic",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Social Media Manager & Content Creator (Freelance / Casual / Project-Based)",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=fbd7839cb235dae9"
+  },
+  "jk:fdf4804d3e400109": {
+    "company": "VZ Media Corp.",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Social Media Executive",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://ca.indeed.com/viewjob?jk=fdf4804d3e400109"
+  },
+  "url:https://londontechjobs.ca/job.aspx": {
+    "company": "Create Job Alert",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "3M Canada - Sales Business Manager, Scotchlite\u2122 Reflective Materials, ISD",
+    "location": "by 3M Canada",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://londontechjobs.ca/job.aspx"
+  },
+  "url:https://www.linkedin.com/jobs/view/4397172138/": {
+    "company": "Unknown Company",
+    "file": "job_data/jobs_2026-05-01.csv",
+    "job_title": "Unknown Title",
+    "location": "Unknown Location",
+    "scraped_at": "2026-05-01",
+    "source_url": "https://www.linkedin.com/jobs/view/4397172138/"
   }
 }

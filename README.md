@@ -22,7 +22,10 @@ source .venv/bin/activate
 python3 Scraper.py serve
 ```
 
-4. In Tampermonkey, use [`indeed_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/indeed_job_saver.user.js).
+4. In Tampermonkey, use the script for the job board you are saving from:
+   - [`tamper_monkey/indeed_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/tamper_monkey/indeed_job_saver.user.js) for Indeed.
+   - [`tamper_monkey/linkedin_careerbeacon_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/tamper_monkey/linkedin_careerbeacon_job_saver.user.js) for LinkedIn and CareerBeacon.
+   - [`tamper_monkey/londontechjobs_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/tamper_monkey/londontechjobs_job_saver.user.js) for London Tech Jobs.
 5. Open the local dashboard at `http://127.0.0.1:8765/` to browse all saved jobs.
 
 Saved jobs are written to:

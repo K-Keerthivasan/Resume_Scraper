@@ -396,6 +396,21 @@
     }
   }
 
+  function isTypingTarget(target) {
+    const tagName = target?.tagName?.toLowerCase();
+    return tagName === "input" || tagName === "textarea" || tagName === "select" || target?.isContentEditable;
+  }
+
+  function isSaveShortcut(event) {
+    return event.altKey && event.shiftKey && !event.ctrlKey && !event.metaKey && event.key?.toLowerCase() === "s";
+  }
+
+  function handleShortcut(event) {
+    if (!isSaveShortcut(event) || isTypingTarget(event.target)) return;
+    event.preventDefault();
+    saveJobToLocalApp(false);
+  }
+
   function autoFillForm() {
     let filled = 0;
 
@@ -478,14 +493,14 @@
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <button id="tm-save-btn" type="button" style="padding:12px 14px;border-radius:14px;border:0;background:linear-gradient(135deg,#20b8f0,#45d0ff);color:#04111a;cursor:pointer;font:inherit;font-weight:700;box-shadow:0 12px 28px rgba(32,184,240,0.22);">Save Job</button>
+          <button id="tm-save-btn" type="button" title="Save Job (Alt+Shift+S)" style="padding:12px 14px;border-radius:14px;border:0;background:linear-gradient(135deg,#20b8f0,#45d0ff);color:#04111a;cursor:pointer;font:inherit;font-weight:700;box-shadow:0 12px 28px rgba(32,184,240,0.22);">Save Job</button>
           <button id="tm-fill-btn" type="button" style="padding:12px 14px;border-radius:14px;border:1px solid rgba(106,194,255,0.14);background:rgba(255,255,255,0.04);color:#eef6ff;cursor:pointer;font:inherit;font-weight:700;">Auto Fill</button>
           <button id="tm-refresh-btn" type="button" style="padding:12px 14px;border-radius:14px;border:1px solid rgba(106,194,255,0.14);background:rgba(255,255,255,0.04);color:#eef6ff;cursor:pointer;font:inherit;">Refresh</button>
           <button id="tm-dashboard-btn" type="button" style="padding:12px 14px;border-radius:14px;border:1px solid rgba(106,194,255,0.14);background:rgba(255,255,255,0.04);color:#eef6ff;cursor:pointer;font:inherit;">Dashboard</button>
         </div>
 
         <div style="font-size:12px;line-height:1.5;color:#8ea2c6;">
-          The saver now highlights email-route jobs, keeps skills collapsible, and pauses on duplicates before a second entry.
+          Shortcut: Alt+Shift+S saves the detected job. The saver highlights email-route jobs and pauses on duplicates.
         </div>
       </div>
     `;
@@ -536,4 +551,5 @@
       setTimeout(autoFillForm, 2000);
     }
   });
+  window.addEventListener("keydown", handleShortcut);
 })();
