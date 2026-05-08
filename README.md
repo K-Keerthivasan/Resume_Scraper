@@ -26,6 +26,7 @@ python3 Scraper.py serve
    - [`tamper_monkey/indeed_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/tamper_monkey/indeed_job_saver.user.js) for Indeed.
    - [`tamper_monkey/linkedin_careerbeacon_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/tamper_monkey/linkedin_careerbeacon_job_saver.user.js) for LinkedIn and CareerBeacon.
    - [`tamper_monkey/londontechjobs_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/tamper_monkey/londontechjobs_job_saver.user.js) for London Tech Jobs.
+   - [`tamper_monkey/universal_canada_job_saver.user.js`](/home/keerthi/Dev/scripts/Resume_Scraper/tamper_monkey/universal_canada_job_saver.user.js) for everything else: Job Bank, federal/provincial portals, major Canadian cities, ATS platforms (Workday, Greenhouse, Lever, iCIMS, Taleo, SuccessFactors, BambooHR, Workable, SmartRecruiters, Recruitee, Bullhorn, Avature, Zoho Recruit, Dayforce, UltiPro, ADP), and Canadian aggregators (Jobillico, Eluta, Talent.com / Neuvoo, Monster.ca, Jobboom, SimplyHired). Reads schema.org JobPosting JSON-LD first, then microdata, then DOM heuristics. Indeed/LinkedIn/CareerBeacon/LondonTechJobs are excluded so their dedicated scrapers handle them.
 5. Open the local dashboard at `http://127.0.0.1:8765/` to browse all saved jobs.
 
 Saved jobs are written to:

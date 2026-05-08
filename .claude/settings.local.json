@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('Scraper.py'\\).read\\(\\)\\); print\\('Scraper.py OK'\\)\")",
+      "Bash(node --check tamper_monkey/universal_canada_job_saver.user.js)",
+      "Bash(python3 -m py_compile Scraper.py)",
+      "Bash(python3 *)",
+      "Bash(awk -F',' 'NR>1 {print $1}' job_data/jobs_2026-05-07.csv)",
+      "Bash(curl -s http://127.0.0.1:8765/api/jobs)",
+      "Bash(curl -s -X POST http://127.0.0.1:8765/api/jobs/update -H 'Content-Type: application/json' -d '{\"row_id\":\"jobs_2026-05-07.csv:9\",\"updates\":{\"status\":\"applied\"}}')",
+      "Bash(curl -s -X POST http://127.0.0.1:8765/api/jobs/update -H 'Content-Type: application/json' -d '{\"row_id\":\"jobs_2026-05-07.csv:9\",\"updates\":{\"status\":\"saved\"}}')",
+      "Bash(curl -s -X POST http://127.0.0.1:8765/api/jobs/delete -H 'Content-Type: application/json' -d '{\"row_ids\":[\"jobs_2026-05-06.csv:31\"]}')",
+      "Bash(kill %1)",
+      "Bash(pkill -f \"Scraper.py serve\")",
+      "Bash(pkill -9 -f \"Scraper.py serve\")",
+      "Bash(kill -9 589335)"
+    ]
+  }
+}

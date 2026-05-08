@@ -100,6 +100,8 @@
     return /viewjob|jk=/i.test(window.location.href);
   }
 
+  const TITLE_SKIP_PATTERN = /^(welcome|hi|hello|home|search|sign in|log in|account|menu|browse jobs?)\b/i;
+
   function readText(selectors, fallback = "") {
     for (const selector of selectors) {
       const el = document.querySelector(selector);
@@ -113,6 +115,43 @@
     return [...document.querySelectorAll("[class*='attribute_snippet'], [data-testid*='attribute']")]
       .map((el) => el.innerText?.trim())
       .find((text) => text && pattern.test(text)) || "N/A";
+  }
+
+  function findPostedDate() {
+    const direct = readText([
+      "[data-testid='myJobsStateDate']",
+      "[data-testid='inlineHeader-companyLocation'] + *",
+      ".jobsearch-JobMetadataFooter",
+      "span.date",
+      "[class*='posted' i]",
+    ]);
+    if (direct && /(today|just posted|posted|days ago|hours ago|yesterday)/i.test(direct)) {
+      return direct;
+    }
+    const jobContainer =
+      document.querySelector("#viewJobSSRRoot") ||
+      document.querySelector(".jobsearch-JobComponent") ||
+      document.querySelector("main") ||
+      document.body;
+
+    const blocked = (el) => {
+      if (!el) return true;
+      if (el.closest && (el.closest("#tm-toast") || el.closest("#tm-panel") || el.closest("#tm-duplicate-modal"))) {
+        return true;
+      }
+      return false;
+    };
+
+    const hit = [...jobContainer.querySelectorAll("span, div, p")]
+      .filter((el) => !blocked(el))
+      .map((el) => el.textContent?.trim() || "")
+      .find(
+        (text) =>
+          text &&
+          text.length < 80 &&
+          /\b(today|just posted|posted (today|yesterday)|\d+\+? (?:days?|hours?) ago|yesterday)\b/i.test(text)
+      );
+    return hit || "N/A";
   }
 
   function extractEmails(text) {
@@ -154,27 +193,64 @@
     };
   }
 
+  function findJobTitle() {
+    const candidates = [
+      "h1.jobsearch-JobInfoHeader-title",
+      "[data-testid='jobsearch-JobInfoHeader-title']",
+      "[data-testid='simpler-jobTitle']",
+      "h2.jobsearch-JobInfoHeader-title",
+      "h1[class*='JobInfoHeader' i]",
+      "h1[class*='jobtitle' i]",
+    ];
+    for (const sel of candidates) {
+      const el = document.querySelector(sel);
+      const text = el?.innerText?.trim();
+      if (text && !TITLE_SKIP_PATTERN.test(text)) return text;
+    }
+    const heads = [...document.querySelectorAll("main h1, [role='main'] h1, h1")];
+    for (const el of heads) {
+      const text = el.innerText?.trim();
+      if (text && !TITLE_SKIP_PATTERN.test(text) && text.length < 200) return text;
+    }
+    const docTitle = document.title.split(/[–|-]/)[0].trim();
+    if (docTitle && !TITLE_SKIP_PATTERN.test(docTitle)) return docTitle;
+    return "Unknown Title";
+  }
+
+  function findLocation() {
+    const candidates = [
+      "[data-testid='inlineHeader-companyLocation']",
+      "[data-testid='job-location']",
+      "[data-testid='jobsearch-JobInfoHeader-companyLocation']",
+      "div[data-testid*='Location' i]",
+      ".companyLocation",
+      ".jobsearch-JobInfoHeader-subtitle div:nth-child(2)",
+    ];
+    for (const sel of candidates) {
+      const el = document.querySelector(sel);
+      const text = el?.innerText?.trim();
+      if (text && text.length < 160) return text;
+    }
+    const subtitle = document.querySelector("[class*='JobInfoHeader-subtitle' i]");
+    if (subtitle) {
+      const lines = subtitle.innerText.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+      const locLine = lines.find((line) => /(remote|hybrid|on[-\s]?site|, [A-Z]{2}\b|ontario|quebec|alberta|british columbia|manitoba|saskatchewan|nova scotia|new brunswick|newfoundland)/i.test(line));
+      if (locLine) return locLine;
+    }
+    return "Unknown Location";
+  }
+
   function scrapeCurrentJob() {
-    const title =
-      readText(["h1.jobsearch-JobInfoHeader-title", "h1[class*='title']", "h1"]) ||
-      document.title.split("–")[0].trim() ||
-      "Unknown Title";
+    const title = findJobTitle();
 
     const company = readText(
-      ["[data-company-name]", "[data-testid='inlineHeader-companyName']", ".companyName"],
+      ["[data-company-name]", "[data-testid='inlineHeader-companyName']", "[data-testid='jobsearch-JobInfoHeader-companyName'] a", ".companyName"],
       "Unknown Company"
     );
 
-    const location = readText(
-      ["[data-testid='job-location']", ".companyLocation"],
-      "Unknown Location"
-    );
+    const location = findLocation();
 
-    const postedDate =
-      [...document.querySelectorAll("*")]
-        .map((el) => el.textContent?.trim())
-        .find((text) => text && /(today|just posted|posted|days ago|hours ago)/i.test(text) && text.length < 80) ||
-      "N/A";
+    const postedDate = findPostedDate();
 
     const salary = pickAttributeText(/\$|salary|hour|year|wage/i);
     const jobType = pickAttributeText(/full.time|part.time|contract|permanent|casual|temporary|intern/i);

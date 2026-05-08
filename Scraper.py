@@ -225,7 +225,7 @@ DASHBOARD_HTML = """<!doctype html>
 
     .toolbar {
       display: grid;
-      grid-template-columns: 1.3fr 0.8fr 0.8fr 0.8fr auto auto;
+      grid-template-columns: 1.1fr 0.7fr 0.7fr 0.7fr 0.7fr 0.7fr auto auto auto;
       gap: 12px;
       padding: 18px;
       margin-bottom: 18px;
@@ -233,6 +233,11 @@ DASHBOARD_HTML = """<!doctype html>
       background:
         linear-gradient(180deg, rgba(255,255,255,0.02), transparent),
         var(--panel-soft);
+    }
+
+    .button.copied {
+      background: linear-gradient(135deg, var(--success), #2bb389);
+      color: #04221a;
     }
 
     .field, .button, select {
@@ -275,9 +280,7 @@ DASHBOARD_HTML = """<!doctype html>
     }
 
     .layout {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 18px;
+      display: block;
       min-height: 62vh;
     }
 
@@ -286,6 +289,86 @@ DASHBOARD_HTML = """<!doctype html>
       background:
         linear-gradient(180deg, rgba(255,255,255,0.02), transparent),
         var(--panel-soft);
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 8, 18, 0.55);
+      backdrop-filter: blur(6px);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(560px, 100vw);
+      background:
+        linear-gradient(180deg, rgba(69, 208, 255, 0.06), transparent 18%),
+        linear-gradient(180deg, rgba(13, 21, 36, 0.98), rgba(8, 13, 23, 0.99));
+      border-left: 1px solid var(--line);
+      box-shadow: -32px 0 60px rgba(0, 0, 0, 0.45);
+      transform: translateX(100%);
+      transition: transform 220ms ease;
+      z-index: 41;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7, 13, 24, 0.6);
+    }
+
+    .drawer-header .eyebrow {
+      margin: 0;
+    }
+
+    .drawer-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+
+    .drawer-close:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(69, 208, 255, 0.32);
+      transform: scale(1.04);
+    }
+
+    .drawer-body {
+      padding: 22px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
 
     table {
@@ -311,6 +394,72 @@ DASHBOARD_HTML = """<!doctype html>
       z-index: 1;
     }
 
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th.sortable:hover {
+      color: var(--ink);
+    }
+
+    .sort-indicator {
+      margin-left: 6px;
+      opacity: 0.6;
+      font-size: 11px;
+    }
+
+    th.sortable.active .sort-indicator {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    th.col-check, td.col-check {
+      width: 36px;
+      padding-right: 0;
+    }
+
+    .row-check {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .status-select {
+      font: inherit;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .status-select:focus {
+      outline: 2px solid rgba(69, 208, 255, 0.18);
+      border-color: var(--accent-strong);
+    }
+
+    .status-select.is-applied { color: var(--accent); border-color: rgba(69, 208, 255, 0.32); }
+    .status-select.is-interview { color: #f5c46a; border-color: rgba(245, 196, 106, 0.34); }
+    .status-select.is-offer { color: var(--success); border-color: rgba(63, 224, 174, 0.4); }
+    .status-select.is-rejected { color: var(--duplicate); border-color: rgba(255, 111, 141, 0.32); }
+    .status-select.is-withdrawn { color: var(--muted); border-color: var(--line); }
+
+    .button.danger {
+      background: linear-gradient(135deg, #ff5577, #ff8b5e);
+      color: #1c0712;
+      box-shadow: 0 10px 24px rgba(255, 85, 119, 0.22);
+    }
+
+    .button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     tbody tr {
       cursor: pointer;
       transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
@@ -326,6 +475,37 @@ DASHBOARD_HTML = """<!doctype html>
     .role {
       font-weight: 700;
       margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .role-open,
+    .role-copy {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: rgba(69, 208, 255, 0.08);
+      transition: background 140ms ease, border-color 140ms ease, transform 140ms ease, color 140ms ease;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .role-open:hover,
+    .role-copy:hover {
+      background: rgba(69, 208, 255, 0.18);
+      border-color: rgba(69, 208, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .role-copy.copied {
+      background: rgba(63, 224, 174, 0.18);
+      border-color: rgba(63, 224, 174, 0.45);
+      color: var(--success);
     }
 
     .company {
@@ -431,7 +611,7 @@ DASHBOARD_HTML = """<!doctype html>
     }
 
     @media (max-width: 1080px) {
-      .hero, .layout { grid-template-columns: 1fr; }
+      .hero { grid-template-columns: 1fr; }
       .toolbar { grid-template-columns: 1fr 1fr 1fr; }
     }
 
@@ -439,6 +619,7 @@ DASHBOARD_HTML = """<!doctype html>
       .shell { padding: 16px; }
       .toolbar { grid-template-columns: 1fr; }
       .details-grid { grid-template-columns: 1fr; }
+      .drawer { width: 100vw; }
       th:nth-child(3), td:nth-child(3),
       th:nth-child(4), td:nth-child(4) { display: none; }
     }
@@ -490,6 +671,19 @@ DASHBOARD_HTML = """<!doctype html>
         <option value="unique">Unique only</option>
         <option value="duplicate">Duplicates only</option>
       </select>
+      <select id="sourceFilter">
+        <option value="">All sources</option>
+      </select>
+      <select id="daysFilter">
+        <option value="">Any time</option>
+        <option value="0">Today</option>
+        <option value="1">Last 24h</option>
+        <option value="3">Last 3 days</option>
+        <option value="7">Last 7 days</option>
+        <option value="14">Last 14 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
+      <button id="deleteBtn" class="button danger" type="button" disabled>Delete (0)</button>
       <button id="refreshBtn" class="button secondary" type="button">Refresh</button>
       <button id="exportBtn" class="button" type="button">Export JSON</button>
     </section>
@@ -499,25 +693,33 @@ DASHBOARD_HTML = """<!doctype html>
         <table>
           <thead>
             <tr>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Saved</th>
+              <th class="col-check"><input type="checkbox" class="row-check" id="checkAll" aria-label="Select all"></th>
+              <th class="sortable" data-sort-key="job_title">Role<span class="sort-indicator"></span></th>
+              <th class="sortable" data-sort-key="status">Status<span class="sort-indicator"></span></th>
+              <th class="sortable active" data-sort-key="scraped_at">Saved<span class="sort-indicator">↓</span></th>
               <th>Signals</th>
             </tr>
           </thead>
           <tbody id="jobsBody">
-            <tr><td colspan="4" class="empty">Loading jobs...</td></tr>
+            <tr><td colspan="5" class="empty">Loading jobs...</td></tr>
           </tbody>
         </table>
       </div>
-
-      <aside class="card details" id="detailsPane">
-        <div class="empty">Select a job to inspect the full entry.</div>
-      </aside>
     </section>
 
     <div class="footer-note" id="footerNote"></div>
   </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawerPane" role="dialog" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="eyebrow">Job Details</div>
+      <button class="drawer-close" id="drawerCloseBtn" type="button" aria-label="Close details">×</button>
+    </div>
+    <div class="drawer-body" id="detailsPane">
+      <div class="empty">Select a job to inspect the full entry.</div>
+    </div>
+  </aside>
 
   <script>
     const state = {
@@ -525,7 +727,17 @@ DASHBOARD_HTML = """<!doctype html>
       filtered: [],
       selectedId: null,
       showSkills: true,
+      selected: new Set(),
+      sort: { key: "scraped_at", dir: "desc" },
     };
+
+    const STATUS_OPTIONS = ["saved", "applied", "interview", "offer", "rejected", "withdrawn"];
+
+    function statusClass(value) {
+      const v = String(value || "").toLowerCase();
+      if (STATUS_OPTIONS.includes(v) && v !== "saved") return `is-${v}`;
+      return "";
+    }
 
     function esc(value) {
       return String(value ?? "")
@@ -544,17 +756,32 @@ DASHBOARD_HTML = """<!doctype html>
       return `<span class="pill ${cls}">${esc(text)}</span>`;
     }
 
+    function daysSince(dateStr) {
+      if (!dateStr) return Infinity;
+      const parsed = Date.parse(dateStr);
+      if (Number.isNaN(parsed)) return Infinity;
+      const now = new Date();
+      const startOfToday = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+      const diffMs = startOfToday - parsed;
+      return Math.floor(diffMs / 86400000);
+    }
+
     function filterJobs() {
       const query = document.getElementById("search").value.trim().toLowerCase();
       const status = document.getElementById("statusFilter").value;
       const channel = document.getElementById("channelFilter").value;
       const duplicateFilter = document.getElementById("duplicateFilter").value;
+      const source = document.getElementById("sourceFilter").value;
+      const daysRaw = document.getElementById("daysFilter").value;
+      const maxDays = daysRaw === "" ? null : Number(daysRaw);
 
       state.filtered = state.jobs.filter((job) => {
         if (status && job.status !== status) return false;
         if (channel && job.application_channel !== channel) return false;
+        if (source && job.source_site !== source) return false;
         if (duplicateFilter === "unique" && job.is_duplicate) return false;
         if (duplicateFilter === "duplicate" && !job.is_duplicate) return false;
+        if (maxDays !== null && daysSince(job.scraped_at) > maxDays) return false;
 
         if (!query) return true;
         return [
@@ -567,12 +794,61 @@ DASHBOARD_HTML = """<!doctype html>
           job.description_summary,
           job.salary,
           job.job_type,
+          job.source_site,
         ].join(" ").toLowerCase().includes(query);
       });
 
+      sortFiltered();
+      pruneSelection();
       renderTable();
       syncSelectedRow();
       renderFooter();
+      renderSortIndicators();
+      renderDeleteButton();
+      syncCheckAll();
+    }
+
+    function sortFiltered() {
+      const { key, dir } = state.sort;
+      const factor = dir === "asc" ? 1 : -1;
+      state.filtered.sort((a, b) => {
+        const av = String(a[key] ?? "").toLowerCase();
+        const bv = String(b[key] ?? "").toLowerCase();
+        if (av < bv) return -1 * factor;
+        if (av > bv) return 1 * factor;
+        const ar = String(a.row_id || "");
+        const br = String(b.row_id || "");
+        return ar < br ? -1 : ar > br ? 1 : 0;
+      });
+    }
+
+    function pruneSelection() {
+      const visibleIds = new Set(state.filtered.map((job) => job.row_id));
+      for (const id of Array.from(state.selected)) {
+        if (!visibleIds.has(id)) state.selected.delete(id);
+      }
+    }
+
+    function renderSortIndicators() {
+      document.querySelectorAll("th.sortable").forEach((th) => {
+        const key = th.dataset.sortKey;
+        const indicator = th.querySelector(".sort-indicator");
+        if (key === state.sort.key) {
+          th.classList.add("active");
+          if (indicator) indicator.textContent = state.sort.dir === "asc" ? "↑" : "↓";
+        } else {
+          th.classList.remove("active");
+          if (indicator) indicator.textContent = "";
+        }
+      });
+    }
+
+    function renderDeleteButton() {
+      const btn = document.getElementById("deleteBtn");
+      if (!btn) return;
+      const count = state.selected.size;
+      btn.textContent = `Delete (${count})`;
+      btn.disabled = count === 0;
     }
 
     function renderSummary(summary) {
@@ -591,22 +867,53 @@ DASHBOARD_HTML = """<!doctype html>
       select.value = statuses.includes(current) ? current : "";
     }
 
+    function renderSourceFilter(jobs) {
+      const select = document.getElementById("sourceFilter");
+      const current = select.value;
+      const sources = [...new Set(jobs.map((job) => job.source_site).filter(Boolean))].sort();
+      select.innerHTML = '<option value="">All sources</option>' +
+        sources.map((source) => `<option value="${esc(source)}">${esc(source)}</option>`).join("");
+      select.value = sources.includes(current) ? current : "";
+    }
+
     function renderTable() {
       const tbody = document.getElementById("jobsBody");
       if (!state.filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty">No jobs match the current filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">No jobs match the current filters.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = state.filtered.map((job) => `
+      tbody.innerHTML = state.filtered.map((job) => {
+        const openUrl = job.source_url || job.apply_url || "";
+        const openLink = openUrl
+          ? `<a class="role-open" href="${esc(openUrl)}" target="_blank" rel="noreferrer" title="Open job listing">Open ↗</a>`
+          : "";
+        const copyBtn = openUrl
+          ? `<button class="role-copy" type="button" data-copy-url="${esc(openUrl)}" title="Copy job link">Copy</button>`
+          : "";
+        const currentStatus = (job.status || "saved").toLowerCase();
+        const optionList = STATUS_OPTIONS.includes(currentStatus)
+          ? STATUS_OPTIONS
+          : [currentStatus, ...STATUS_OPTIONS];
+        const options = optionList
+          .map((opt) => `<option value="${esc(opt)}" ${opt === currentStatus ? "selected" : ""}>${esc(opt)}</option>`)
+          .join("");
+        const checked = state.selected.has(job.row_id) ? "checked" : "";
+        return `
         <tr data-id="${esc(job.row_id)}" class="${job.row_id === state.selectedId ? "active" : ""}">
+          <td class="col-check"><input type="checkbox" class="row-check" data-check-id="${esc(job.row_id)}" ${checked} aria-label="Select row"></td>
           <td>
-            <div class="role">${esc(job.job_title)}</div>
+            <div class="role"><span>${esc(job.job_title)}</span>${openLink}${copyBtn}</div>
             <div class="company">${esc(job.company)} • ${esc(job.location)}</div>
           </td>
-          <td>${badge(job.status || "saved")}</td>
+          <td>
+            <select class="status-select ${statusClass(currentStatus)}" data-status-id="${esc(job.row_id)}" aria-label="Status">
+              ${options}
+            </select>
+          </td>
           <td>${esc(job.scraped_at)}</td>
           <td>
+            ${job.source_site ? badge(job.source_site) : ""}
             ${job.is_duplicate ? badge("Duplicate", "duplicate") : badge("Unique")}
             ${job.application_channel === "email" ? badge("Email apply") : badge("Platform")}
             ${job.contact_emails && job.contact_emails !== "N/A" ? badge("Has email") : ""}
@@ -614,13 +921,86 @@ DASHBOARD_HTML = """<!doctype html>
             ${job.job_type && job.job_type !== "N/A" ? badge(job.job_type) : ""}
           </td>
         </tr>
-      `).join("");
+      `;
+      }).join("");
+
+      tbody.querySelectorAll("input.row-check").forEach((cb) => {
+        cb.addEventListener("click", (event) => event.stopPropagation());
+        cb.addEventListener("change", () => {
+          const id = cb.dataset.checkId;
+          if (cb.checked) state.selected.add(id);
+          else state.selected.delete(id);
+          renderDeleteButton();
+          syncCheckAll();
+        });
+      });
+
+      tbody.querySelectorAll("select.status-select").forEach((sel) => {
+        sel.addEventListener("click", (event) => event.stopPropagation());
+        sel.addEventListener("change", async () => {
+          const id = sel.dataset.statusId;
+          const newStatus = sel.value;
+          sel.disabled = true;
+          try {
+            const response = await fetch("/api/jobs/update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ row_id: id, updates: { status: newStatus } }),
+            });
+            const data = await response.json();
+            if (!data.ok) throw new Error(data.error || "Update failed");
+            const job = state.jobs.find((j) => j.row_id === id);
+            if (job) job.status = newStatus;
+            sel.className = `status-select ${statusClass(newStatus)}`;
+          } catch (err) {
+            sel.value = (state.jobs.find((j) => j.row_id === id) || {}).status || "saved";
+            console.error("Status update failed:", err);
+          } finally {
+            sel.disabled = false;
+          }
+        });
+      });
 
       tbody.querySelectorAll("tr[data-id]").forEach((row) => {
         row.addEventListener("click", () => {
           state.selectedId = row.dataset.id;
-          syncSelectedRow();
+          tbodyState();
           renderDetails();
+          openDrawer();
+        });
+      });
+
+      tbody.querySelectorAll("a.role-open").forEach((link) => {
+        link.addEventListener("click", (event) => event.stopPropagation());
+      });
+
+      tbody.querySelectorAll("button.role-copy").forEach((btn) => {
+        btn.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const url = btn.getAttribute("data-copy-url") || "";
+          if (!url) return;
+          try {
+            if (navigator.clipboard?.writeText) {
+              await navigator.clipboard.writeText(url);
+            } else {
+              const ta = document.createElement("textarea");
+              ta.value = url;
+              ta.style.position = "fixed";
+              ta.style.opacity = "0";
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand("copy");
+              document.body.removeChild(ta);
+            }
+            btn.classList.add("copied");
+            btn.textContent = "Copied!";
+          } catch {
+            btn.textContent = "Failed";
+          }
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.textContent = "Copy";
+          }, 1400);
         });
       });
     }
@@ -628,16 +1008,69 @@ DASHBOARD_HTML = """<!doctype html>
     function syncSelectedRow() {
       const currentVisible = state.filtered.some((job) => job.row_id === state.selectedId);
       if (!currentVisible) {
-        state.selectedId = state.filtered[0]?.row_id || null;
+        state.selectedId = null;
+        closeDrawer();
       }
       tbodyState();
       renderDetails();
+    }
+
+    function openDrawer() {
+      document.getElementById("drawerPane")?.classList.add("open");
+      document.getElementById("drawerBackdrop")?.classList.add("open");
+      document.getElementById("drawerPane")?.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDrawer() {
+      document.getElementById("drawerPane")?.classList.remove("open");
+      document.getElementById("drawerBackdrop")?.classList.remove("open");
+      document.getElementById("drawerPane")?.setAttribute("aria-hidden", "true");
     }
 
     function tbodyState() {
       document.querySelectorAll("#jobsBody tr[data-id]").forEach((row) => {
         row.classList.toggle("active", row.dataset.id === state.selectedId);
       });
+    }
+
+    function syncCheckAll() {
+      const checkAll = document.getElementById("checkAll");
+      if (!checkAll) return;
+      const total = state.filtered.length;
+      const selected = state.filtered.filter((job) => state.selected.has(job.row_id)).length;
+      checkAll.checked = total > 0 && selected === total;
+      checkAll.indeterminate = selected > 0 && selected < total;
+    }
+
+    async function bulkDelete() {
+      const ids = Array.from(state.selected);
+      if (!ids.length) return;
+      const confirmed = window.confirm(`Delete ${ids.length} job${ids.length === 1 ? "" : "s"}? This rewrites the CSV files and cannot be undone.`);
+      if (!confirmed) return;
+      const btn = document.getElementById("deleteBtn");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Deleting...";
+      }
+      try {
+        const response = await fetch("/api/jobs/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ row_ids: ids }),
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "Delete failed");
+        state.selected.clear();
+        if (state.selectedId && ids.includes(state.selectedId)) {
+          state.selectedId = null;
+          closeDrawer();
+        }
+        await loadJobs();
+      } catch (err) {
+        console.error("Bulk delete failed:", err);
+        if (btn) btn.textContent = "Delete failed";
+        setTimeout(renderDeleteButton, 1400);
+      }
     }
 
     function renderDetails() {
@@ -661,7 +1094,6 @@ DASHBOARD_HTML = """<!doctype html>
 
       pane.innerHTML = `
         <div>
-          <div class="eyebrow">Job Details</div>
           <h2>${esc(job.job_title)}</h2>
           <p class="hero-copy">${esc(job.company)} • ${esc(job.location)}</p>
           <div class="actions" style="margin-top:14px;">${signalBadges}</div>
@@ -669,7 +1101,9 @@ DASHBOARD_HTML = """<!doctype html>
 
         <div class="actions">
           ${job.apply_url ? `<a class="button" href="${esc(job.apply_url)}" target="_blank" rel="noreferrer">Open Apply URL</a>` : ""}
-          ${job.source_url ? `<a class="button secondary" href="${esc(job.source_url)}" target="_blank" rel="noreferrer">Open Source URL</a>` : ""}
+          ${job.source_url ? `<a class="button secondary" href="${esc(job.source_url)}" target="_blank" rel="noreferrer">Open Indeed Link</a>` : ""}
+          ${job.source_url ? `<button class="button secondary" type="button" data-copy="${esc(job.source_url)}" data-label="Copy Indeed Link">Copy Indeed Link</button>` : ""}
+          ${job.apply_url ? `<button class="button secondary" type="button" data-copy="${esc(job.apply_url)}" data-label="Copy Apply URL">Copy Apply URL</button>` : ""}
         </div>
 
         <div class="details-grid">
@@ -681,6 +1115,7 @@ DASHBOARD_HTML = """<!doctype html>
           <div class="meta"><div class="meta-label">Duplicate</div><div class="meta-value">${esc(duplicateText)}</div></div>
           <div class="meta"><div class="meta-label">Apply Channel</div><div class="meta-value">${esc(fmt(job.application_channel))}</div></div>
           <div class="meta"><div class="meta-label">Contact Emails</div><div class="meta-value">${esc(fmt(job.contact_emails))}</div></div>
+          <div class="meta"><div class="meta-label">Source Site</div><div class="meta-value">${esc(fmt(job.source_site))}</div></div>
           <div class="meta"><div class="meta-label">Source File</div><div class="meta-value">${esc(fmt(job.file))}</div></div>
           <div class="meta"><div class="meta-label">Job Key</div><div class="meta-value">${esc(fmt(job.job_key))}</div></div>
         </div>
@@ -703,6 +1138,37 @@ DASHBOARD_HTML = """<!doctype html>
         state.showSkills = !state.showSkills;
         renderDetails();
       });
+
+      pane.querySelectorAll("button[data-copy]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const text = btn.getAttribute("data-copy") || "";
+          const label = btn.getAttribute("data-label") || btn.textContent;
+          if (!text) return;
+          try {
+            if (navigator.clipboard?.writeText) {
+              await navigator.clipboard.writeText(text);
+            } else {
+              const ta = document.createElement("textarea");
+              ta.value = text;
+              ta.style.position = "fixed";
+              ta.style.opacity = "0";
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand("copy");
+              document.body.removeChild(ta);
+            }
+            btn.classList.add("copied");
+            btn.textContent = "Copied!";
+            setTimeout(() => {
+              btn.classList.remove("copied");
+              btn.textContent = label;
+            }, 1400);
+          } catch (err) {
+            btn.textContent = "Copy failed";
+            setTimeout(() => { btn.textContent = label; }, 1400);
+          }
+        });
+      });
     }
 
     function renderFooter() {
@@ -721,6 +1187,7 @@ DASHBOARD_HTML = """<!doctype html>
       state.jobs = payload.jobs || [];
       renderSummary(payload.summary || { total_jobs: 0, saved_today: 0, duplicate_entries: 0 });
       renderStatusFilter(state.jobs);
+      renderSourceFilter(state.jobs);
       filterJobs();
     }
 
@@ -738,8 +1205,41 @@ DASHBOARD_HTML = """<!doctype html>
     document.getElementById("statusFilter").addEventListener("change", filterJobs);
     document.getElementById("channelFilter").addEventListener("change", filterJobs);
     document.getElementById("duplicateFilter").addEventListener("change", filterJobs);
+    document.getElementById("sourceFilter").addEventListener("change", filterJobs);
+    document.getElementById("daysFilter").addEventListener("change", filterJobs);
     document.getElementById("refreshBtn").addEventListener("click", loadJobs);
     document.getElementById("exportBtn").addEventListener("click", exportJson);
+    document.getElementById("deleteBtn").addEventListener("click", bulkDelete);
+    document.getElementById("drawerCloseBtn").addEventListener("click", closeDrawer);
+    document.getElementById("drawerBackdrop").addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeDrawer();
+    });
+
+    document.getElementById("checkAll").addEventListener("change", (event) => {
+      if (event.target.checked) {
+        state.filtered.forEach((job) => state.selected.add(job.row_id));
+      } else {
+        state.filtered.forEach((job) => state.selected.delete(job.row_id));
+      }
+      renderTable();
+      syncSelectedRow();
+      renderDeleteButton();
+      syncCheckAll();
+    });
+
+    document.querySelectorAll("th.sortable").forEach((th) => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.sortKey;
+        if (state.sort.key === key) {
+          state.sort.dir = state.sort.dir === "asc" ? "desc" : "asc";
+        } else {
+          state.sort.key = key;
+          state.sort.dir = "asc";
+        }
+        filterJobs();
+      });
+    });
 
     loadJobs().catch((error) => {
       document.getElementById("jobsBody").innerHTML =
@@ -770,12 +1270,26 @@ def normalize_text(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", lowered).strip("-")
 
 
-def clean_indeed_url(url: str) -> str:
-    parsed = urlparse(url.strip())
+TRACKING_QUERY_PARAMS = {
+    "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "utm_id",
+    "fbclid", "gclid", "msclkid", "yclid", "mc_cid", "mc_eid",
+    "ref", "referer", "referrer", "src", "source",
+    "trk", "trk_info", "tracking_id", "tk", "tid",
+    "_ga", "_gl", "hsa_acc", "hsa_cam", "hsa_grp",
+}
+
+INDEED_KEEP_KEYS = {"jk", "vjs", "from"}
+
+
+def clean_job_url(url: str) -> str:
+    parsed = urlparse((url or "").strip())
+    host = (parsed.hostname or "").lower()
     query = parse_qs(parsed.query)
 
-    keep_keys = {"jk", "vjs", "from"}
-    filtered = {key: value for key, value in query.items() if key in keep_keys}
+    if "indeed" in host:
+        filtered = {k: v for k, v in query.items() if k in INDEED_KEEP_KEYS}
+    else:
+        filtered = {k: v for k, v in query.items() if k.lower() not in TRACKING_QUERY_PARAMS}
 
     cleaned = parsed._replace(
         params="",
@@ -783,6 +1297,14 @@ def clean_indeed_url(url: str) -> str:
         query=urlencode(filtered, doseq=True),
     )
     return urlunparse(cleaned)
+
+
+def derive_source_site(url: str) -> str:
+    try:
+        host = (urlparse(url or "").hostname or "").lower()
+    except Exception:
+        host = ""
+    return host[4:] if host.startswith("www.") else host
 
 
 def extract_emails_from_text(text: str) -> list[str]:
@@ -861,10 +1383,10 @@ def compute_job_key(job: dict[str, Any]) -> str:
             return f"jk:{indeed_id}"
 
     if source_url and is_meaningful_job_url(source_url):
-        return f"url:{clean_indeed_url(source_url)}"
+        return f"url:{clean_job_url(source_url)}"
 
     if apply_url and not apply_url.lower().startswith("mailto:") and is_meaningful_job_url(apply_url):
-        return f"url:{clean_indeed_url(apply_url)}"
+        return f"url:{clean_job_url(apply_url)}"
 
     title = normalize_text(str(job.get("job_title", "")))
     company = normalize_text(str(job.get("company", "")))
@@ -904,7 +1426,7 @@ def normalize_job_payload(job: dict[str, Any]) -> dict[str, str]:
             ).strip().lower()
             or application_channel,
             "apply_url": apply_url,
-            "source_url": clean_indeed_url(source_url) if source_url else "",
+            "source_url": clean_job_url(source_url) if source_url else "",
             "scraped_at": str(job.get("scraped_at", today_iso())).strip() or today_iso(),
             "status": str(job.get("status", "saved")).strip() or "saved",
         }
@@ -1014,6 +1536,97 @@ def store_job(job: dict[str, Any], allow_duplicate: bool = False) -> dict[str, A
     }
 
 
+UPDATABLE_FIELDS = {"status"}
+
+
+def parse_row_id(row_id: str) -> tuple[Path, int] | None:
+    if not isinstance(row_id, str) or ":" not in row_id:
+        return None
+    file_part, _, row_part = row_id.rpartition(":")
+    try:
+        row_number = int(row_part)
+    except ValueError:
+        return None
+    candidate = (JOB_DATA_DIR / file_part).resolve()
+    try:
+        candidate.relative_to(JOB_DATA_DIR.resolve())
+    except ValueError:
+        return None
+    if not candidate.is_file():
+        return None
+    return candidate, row_number
+
+
+def update_job_row(row_id: str, updates: dict[str, Any]) -> dict[str, Any]:
+    parsed = parse_row_id(row_id)
+    if parsed is None:
+        return {"ok": False, "error": "Invalid row_id"}
+    path, target_row = parsed
+    if not isinstance(updates, dict) or not updates:
+        return {"ok": False, "error": "No updates provided"}
+
+    cleaned: dict[str, str] = {}
+    for key, value in updates.items():
+        if key in UPDATABLE_FIELDS:
+            cleaned[key] = str(value).strip()
+    if not cleaned:
+        return {"ok": False, "error": "No updatable fields supplied"}
+
+    ensure_csv_schema(path)
+    with path.open("r", newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        rows = list(reader)
+
+    target_index = target_row - 2
+    if target_index < 0 or target_index >= len(rows):
+        return {"ok": False, "error": "Row out of range"}
+
+    rows[target_index].update(cleaned)
+
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(normalize_job_payload(row))
+
+    return {"ok": True, "updated": cleaned}
+
+
+def delete_job_rows(row_ids: list[str]) -> dict[str, Any]:
+    if not isinstance(row_ids, list) or not row_ids:
+        return {"ok": False, "error": "No row_ids provided"}
+
+    grouped: dict[Path, set[int]] = {}
+    invalid: list[str] = []
+    for row_id in row_ids:
+        parsed = parse_row_id(row_id)
+        if parsed is None:
+            invalid.append(row_id)
+            continue
+        path, row_number = parsed
+        grouped.setdefault(path, set()).add(row_number)
+
+    deleted = 0
+    for path, target_rows in grouped.items():
+        ensure_csv_schema(path)
+        with path.open("r", newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            rows = list(reader)
+        kept = [row for idx, row in enumerate(rows, start=2) if idx not in target_rows]
+        deleted += len(rows) - len(kept)
+        if not kept:
+            path.unlink()
+            continue
+        with path.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
+            writer.writeheader()
+            for row in kept:
+                writer.writerow(normalize_job_payload(row))
+
+    rebuild_job_index()
+    return {"ok": True, "deleted": deleted, "invalid": invalid}
+
+
 def get_today_summary() -> dict[str, Any]:
     ensure_storage()
     path = daily_csv_path()
@@ -1049,6 +1662,9 @@ def load_all_jobs() -> list[dict[str, Any]]:
                         "job_key": job_key,
                         "row_id": f"{path.name}:{row_number}",
                         "file": str(path.relative_to(BASE_DIR)),
+                        "source_site": derive_source_site(
+                            normalized.get("source_url") or normalized.get("apply_url") or ""
+                        ),
                     }
                 )
 
@@ -1122,7 +1738,7 @@ class JobRequestHandler(BaseHTTPRequestHandler):
         self._send_json(404, {"ok": False, "error": "Not found"})
 
     def do_POST(self) -> None:
-        if self.path != "/api/jobs":
+        if self.path not in {"/api/jobs", "/api/jobs/update", "/api/jobs/delete"}:
             self._send_json(404, {"ok": False, "error": "Not found"})
             return
 
@@ -1132,6 +1748,24 @@ class JobRequestHandler(BaseHTTPRequestHandler):
             payload = json.loads(raw.decode("utf-8"))
         except (ValueError, json.JSONDecodeError):
             self._send_json(400, {"ok": False, "error": "Invalid JSON payload"})
+            return
+
+        if self.path == "/api/jobs/update":
+            if not isinstance(payload, dict):
+                self._send_json(400, {"ok": False, "error": "Expected object payload"})
+                return
+            result = update_job_row(payload.get("row_id", ""), payload.get("updates", {}))
+            status_code = 200 if result.get("ok") else 400
+            self._send_json(status_code, {**result, "summary": build_dashboard_payload()["summary"]})
+            return
+
+        if self.path == "/api/jobs/delete":
+            if not isinstance(payload, dict):
+                self._send_json(400, {"ok": False, "error": "Expected object payload"})
+                return
+            result = delete_job_rows(payload.get("row_ids", []))
+            status_code = 200 if result.get("ok") else 400
+            self._send_json(status_code, {**result, "summary": build_dashboard_payload()["summary"]})
             return
 
         jobs = payload if isinstance(payload, list) else [payload]
