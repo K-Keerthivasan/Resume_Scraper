@@ -22,6 +22,7 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 BASE_DIR = Path(__file__).resolve().parent
 JOB_DATA_DIR = BASE_DIR / "job_data"
 INDEX_FILE = JOB_DATA_DIR / "job_index.json"
+BLACKLIST_FILE = JOB_DATA_DIR / "blacklist.json"
 EMAIL_PATTERN = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
 
 CSV_FIELDS = [
@@ -40,7 +41,12 @@ CSV_FIELDS = [
     "source_url",
     "scraped_at",
     "status",
+    "applied",
+    "flagged",
 ]
+
+APPLIED_VALUES = {"", "yes"}
+FLAGGED_VALUES = {"", "yes"}
 
 DASHBOARD_HTML = """<!doctype html>
 <html lang="en">
@@ -429,24 +435,206 @@ DASHBOARD_HTML = """<!doctype html>
     .status-select {
       font: inherit;
       font-size: 12px;
+      font-weight: 600;
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(69, 208, 255, 0.28);
+      background: rgba(69, 208, 255, 0.08);
       color: var(--ink);
       cursor: pointer;
     }
 
     .status-select:focus {
-      outline: 2px solid rgba(69, 208, 255, 0.18);
+      outline: 2px solid rgba(69, 208, 255, 0.28);
       border-color: var(--accent-strong);
     }
 
-    .status-select.is-applied { color: var(--accent); border-color: rgba(69, 208, 255, 0.32); }
-    .status-select.is-interview { color: #f5c46a; border-color: rgba(245, 196, 106, 0.34); }
-    .status-select.is-offer { color: var(--success); border-color: rgba(63, 224, 174, 0.4); }
-    .status-select.is-rejected { color: var(--duplicate); border-color: rgba(255, 111, 141, 0.32); }
-    .status-select.is-withdrawn { color: var(--muted); border-color: var(--line); }
+    .status-select.is-saved { color: var(--accent); border-color: rgba(69, 208, 255, 0.42); background: rgba(69, 208, 255, 0.12); }
+    .status-select.is-applied { color: var(--accent); border-color: rgba(69, 208, 255, 0.42); background: rgba(69, 208, 255, 0.12); }
+    .status-select.is-interview { color: #f5c46a; border-color: rgba(245, 196, 106, 0.4); background: rgba(245, 196, 106, 0.08); }
+    .status-select.is-offer { color: var(--success); border-color: rgba(63, 224, 174, 0.4); background: rgba(63, 224, 174, 0.08); }
+    .status-select.is-rejected { color: var(--duplicate); border-color: rgba(255, 111, 141, 0.4); background: rgba(255, 111, 141, 0.08); }
+    .status-select.is-withdrawn { color: var(--muted); border-color: var(--line); background: rgba(255, 255, 255, 0.04); }
+    .status-select.is-blacklist { color: var(--duplicate); border-color: rgba(255, 111, 141, 0.55); background: rgba(255, 111, 141, 0.1); }
+
+    .applied-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .applied-check {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--success);
+      cursor: pointer;
+    }
+    .applied-check:checked + .applied-label { color: var(--success); }
+    .applied-label {
+      font-size: 12px;
+      color: var(--muted);
+      user-select: none;
+      cursor: pointer;
+    }
+    .flag-btn {
+      font: inherit;
+      font-size: 14px;
+      line-height: 1;
+      padding: 5px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+    .flag-btn:hover { color: #f5c46a; border-color: rgba(245, 196, 106, 0.34); }
+    .flag-btn.is-flagged {
+      color: #f5c46a;
+      border-color: rgba(245, 196, 106, 0.55);
+      background: rgba(245, 196, 106, 0.14);
+    }
+
+    .download-menu {
+      position: relative;
+    }
+    .download-menu > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    .download-menu > summary::-webkit-details-marker { display: none; }
+    .download-menu[open] > summary { box-shadow: 0 0 0 2px rgba(69, 208, 255, 0.18); }
+    .download-menu .menu-pop {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      min-width: 180px;
+      z-index: 30;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+    }
+    .download-menu .menu-pop button {
+      background: transparent;
+      border: 0;
+      color: var(--ink);
+      text-align: left;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .download-menu .menu-pop button:hover {
+      background: rgba(69, 208, 255, 0.12);
+      color: var(--accent);
+    }
+
+    .row-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .row-actions button {
+      font: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      background: rgba(255, 111, 141, 0.06);
+      border: 1px solid rgba(255, 111, 141, 0.22);
+      border-radius: 999px;
+      padding: 2px 8px;
+      cursor: pointer;
+      transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .row-actions button:hover {
+      color: var(--duplicate);
+      background: rgba(255, 111, 141, 0.16);
+      border-color: rgba(255, 111, 141, 0.45);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 19, 0.72);
+      display: none;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open { display: block; }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(560px, 92vw);
+      max-height: 80vh;
+      overflow: auto;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      z-index: 60;
+      display: none;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal.open { display: block; }
+
+    .modal h2 { margin: 0 0 14px; font-family: var(--font-display); font-size: 22px; }
+    .modal h3 { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+
+    .bl-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .bl-list .bl-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 111, 141, 0.1);
+      border: 1px solid rgba(255, 111, 141, 0.28);
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    .bl-list .bl-chip button {
+      background: transparent;
+      border: 0;
+      color: var(--duplicate);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 0 0 4px;
+    }
+
+    .bl-empty { color: var(--muted); font-size: 12px; }
+
+    .bl-add-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .bl-add-row input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      color: var(--ink);
+      font: inherit;
+    }
 
     .button.danger {
       background: linear-gradient(135deg, #ff5577, #ff8b5e);
@@ -620,8 +808,8 @@ DASHBOARD_HTML = """<!doctype html>
       .toolbar { grid-template-columns: 1fr; }
       .details-grid { grid-template-columns: 1fr; }
       .drawer { width: 100vw; }
-      th:nth-child(3), td:nth-child(3),
-      th:nth-child(4), td:nth-child(4) { display: none; }
+      th:nth-child(5), td:nth-child(5),
+      th:nth-child(6), td:nth-child(6) { display: none; }
     }
   </style>
 </head>
@@ -684,8 +872,16 @@ DASHBOARD_HTML = """<!doctype html>
         <option value="30">Last 30 days</option>
       </select>
       <button id="deleteBtn" class="button danger" type="button" disabled>Delete (0)</button>
+      <button id="blacklistBtn" class="button secondary" type="button">Blacklist (0)</button>
       <button id="refreshBtn" class="button secondary" type="button">Refresh</button>
-      <button id="exportBtn" class="button" type="button">Export JSON</button>
+      <details class="download-menu" id="downloadMenu">
+        <summary class="button">Download CSV ▾</summary>
+        <div class="menu-pop">
+          <button type="button" data-download-days="7">Last 7 days</button>
+          <button type="button" data-download-days="30">Last 30 days</button>
+          <button type="button" data-download-days="all">All time</button>
+        </div>
+      </details>
     </section>
 
     <section class="layout">
@@ -696,18 +892,43 @@ DASHBOARD_HTML = """<!doctype html>
               <th class="col-check"><input type="checkbox" class="row-check" id="checkAll" aria-label="Select all"></th>
               <th class="sortable" data-sort-key="job_title">Role<span class="sort-indicator"></span></th>
               <th class="sortable" data-sort-key="status">Status<span class="sort-indicator"></span></th>
+              <th class="sortable" data-sort-key="applied">Applied<span class="sort-indicator"></span></th>
               <th class="sortable active" data-sort-key="scraped_at">Saved<span class="sort-indicator">↓</span></th>
               <th>Signals</th>
             </tr>
           </thead>
           <tbody id="jobsBody">
-            <tr><td colspan="5" class="empty">Loading jobs...</td></tr>
+            <tr><td colspan="6" class="empty">Loading jobs...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
     <div class="footer-note" id="footerNote"></div>
+  </div>
+
+  <div class="modal-backdrop" id="blacklistBackdrop"></div>
+  <div class="modal" id="blacklistModal" role="dialog" aria-hidden="true">
+    <h2>Manage Blacklist</h2>
+    <p class="hero-copy">Blacklisted companies and role keywords are auto-tagged with status <strong>blacklist</strong>. Filter by status to view them.</p>
+
+    <h3>Companies <span id="blCompanyCount" class="bl-empty"></span></h3>
+    <div id="blCompanies" class="bl-list"></div>
+    <div class="bl-add-row">
+      <input id="blCompanyInput" type="text" placeholder="Add company name (exact match, case-insensitive)">
+      <button class="button secondary" type="button" id="blCompanyAddBtn">Add</button>
+    </div>
+
+    <h3>Role keywords <span id="blRoleCount" class="bl-empty"></span></h3>
+    <div id="blRoles" class="bl-list"></div>
+    <div class="bl-add-row">
+      <input id="blRoleInput" type="text" placeholder="Add role keyword (substring match)">
+      <button class="button secondary" type="button" id="blRoleAddBtn">Add</button>
+    </div>
+
+    <div class="actions" style="margin-top:18px; justify-content:flex-end;">
+      <button class="button" type="button" id="blacklistCloseBtn">Close</button>
+    </div>
   </div>
 
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
@@ -729,14 +950,23 @@ DASHBOARD_HTML = """<!doctype html>
       showSkills: true,
       selected: new Set(),
       sort: { key: "scraped_at", dir: "desc" },
+      blacklist: { companies: [], roles: [] },
     };
 
-    const STATUS_OPTIONS = ["saved", "applied", "interview", "offer", "rejected", "withdrawn"];
+    const STATUS_OPTIONS = ["saved", "applied", "interview", "offer", "rejected", "withdrawn", "blacklist"];
 
     function statusClass(value) {
       const v = String(value || "").toLowerCase();
-      if (STATUS_OPTIONS.includes(v) && v !== "saved") return `is-${v}`;
+      if (STATUS_OPTIONS.includes(v)) return `is-${v}`;
       return "";
+    }
+
+    function isApplied(value) {
+      return String(value || "").toLowerCase() === "yes";
+    }
+
+    function isFlagged(value) {
+      return String(value || "").toLowerCase() === "yes";
     }
 
     function esc(value) {
@@ -776,7 +1006,11 @@ DASHBOARD_HTML = """<!doctype html>
       const maxDays = daysRaw === "" ? null : Number(daysRaw);
 
       state.filtered = state.jobs.filter((job) => {
-        if (status && job.status !== status) return false;
+        if (status) {
+          if (job.status !== status) return false;
+        } else if (job.status === "blacklist") {
+          return false;
+        }
         if (channel && job.application_channel !== channel) return false;
         if (source && job.source_site !== source) return false;
         if (duplicateFilter === "unique" && job.is_duplicate) return false;
@@ -861,7 +1095,9 @@ DASHBOARD_HTML = """<!doctype html>
     function renderStatusFilter(jobs) {
       const select = document.getElementById("statusFilter");
       const current = select.value;
-      const statuses = [...new Set(jobs.map((job) => job.status).filter(Boolean))].sort();
+      const found = new Set(jobs.map((job) => job.status).filter(Boolean));
+      STATUS_OPTIONS.forEach((s) => found.add(s));
+      const statuses = [...found].sort();
       select.innerHTML = '<option value="">All statuses</option>' +
         statuses.map((status) => `<option value="${esc(status)}">${esc(status)}</option>`).join("");
       select.value = statuses.includes(current) ? current : "";
@@ -879,7 +1115,7 @@ DASHBOARD_HTML = """<!doctype html>
     function renderTable() {
       const tbody = document.getElementById("jobsBody");
       if (!state.filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">No jobs match the current filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">No jobs match the current filters.</td></tr>';
         return;
       }
 
@@ -905,11 +1141,24 @@ DASHBOARD_HTML = """<!doctype html>
           <td>
             <div class="role"><span>${esc(job.job_title)}</span>${openLink}${copyBtn}</div>
             <div class="company">${esc(job.company)} • ${esc(job.location)}</div>
+            <div class="row-actions">
+              <button type="button" data-bl-kind="company" data-bl-value="${esc(job.company)}" title="Blacklist this company">Block company</button>
+              <button type="button" data-bl-kind="role" data-bl-value="${esc(job.job_title)}" title="Blacklist this role title">Block role</button>
+            </div>
           </td>
           <td>
             <select class="status-select ${statusClass(currentStatus)}" data-status-id="${esc(job.row_id)}" aria-label="Status">
               ${options}
             </select>
+          </td>
+          <td>
+            <div class="applied-cell">
+              <label class="applied-cell" title="Mark as applied">
+                <input type="checkbox" class="applied-check" data-applied-id="${esc(job.row_id)}" ${isApplied(job.applied) ? "checked" : ""} aria-label="Applied">
+                <span class="applied-label">Applied</span>
+              </label>
+              <button type="button" class="flag-btn ${isFlagged(job.flagged) ? "is-flagged" : ""}" data-flag-id="${esc(job.row_id)}" title="${isFlagged(job.flagged) ? "Remove flag" : "Flag as useless (the userscript will warn on this job)"}" aria-label="Flag as useless" aria-pressed="${isFlagged(job.flagged) ? "true" : "false"}">⚑</button>
+            </div>
           </td>
           <td>${esc(job.scraped_at)}</td>
           <td>
@@ -919,6 +1168,7 @@ DASHBOARD_HTML = """<!doctype html>
             ${job.contact_emails && job.contact_emails !== "N/A" ? badge("Has email") : ""}
             ${job.salary && job.salary !== "N/A" ? badge(job.salary) : ""}
             ${job.job_type && job.job_type !== "N/A" ? badge(job.job_type) : ""}
+            ${isFlagged(job.flagged) ? badge("⚑ Flagged", "duplicate") : ""}
           </td>
         </tr>
       `;
@@ -972,6 +1222,85 @@ DASHBOARD_HTML = """<!doctype html>
 
       tbody.querySelectorAll("a.role-open").forEach((link) => {
         link.addEventListener("click", (event) => event.stopPropagation());
+      });
+
+      tbody.querySelectorAll("input.applied-check").forEach((cb) => {
+        cb.addEventListener("click", (event) => event.stopPropagation());
+        cb.addEventListener("change", async () => {
+          const id = cb.dataset.appliedId;
+          const newApplied = cb.checked ? "yes" : "";
+          cb.disabled = true;
+          try {
+            const response = await fetch("/api/jobs/update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ row_id: id, updates: { applied: newApplied } }),
+            });
+            const data = await response.json();
+            if (!data.ok) throw new Error(data.error || "Update failed");
+            const job = state.jobs.find((j) => j.row_id === id);
+            if (job) job.applied = newApplied;
+          } catch (err) {
+            cb.checked = isApplied((state.jobs.find((j) => j.row_id === id) || {}).applied);
+            console.error("Applied update failed:", err);
+          } finally {
+            cb.disabled = false;
+          }
+        });
+      });
+
+      tbody.querySelectorAll("button.flag-btn").forEach((btn) => {
+        btn.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const id = btn.dataset.flagId;
+          const job = state.jobs.find((j) => j.row_id === id);
+          const newFlagged = isFlagged(job?.flagged) ? "" : "yes";
+          btn.disabled = true;
+          try {
+            const response = await fetch("/api/jobs/update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ row_id: id, updates: { flagged: newFlagged } }),
+            });
+            const data = await response.json();
+            if (!data.ok) throw new Error(data.error || "Update failed");
+            if (job) job.flagged = newFlagged;
+            btn.classList.toggle("is-flagged", isFlagged(newFlagged));
+            btn.setAttribute("aria-pressed", isFlagged(newFlagged) ? "true" : "false");
+            btn.title = isFlagged(newFlagged) ? "Remove flag" : "Flag as useless (the userscript will warn on this job)";
+          } catch (err) {
+            console.error("Flag update failed:", err);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+
+      tbody.querySelectorAll(".row-actions button[data-bl-kind]").forEach((btn) => {
+        btn.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          const kind = btn.dataset.blKind;
+          const value = btn.dataset.blValue || "";
+          if (!value) return;
+          const label = kind === "company" ? "company" : "role title";
+          if (!window.confirm(`Add this ${label} to the blacklist?\n\n${value}`)) return;
+          btn.disabled = true;
+          try {
+            const response = await fetch("/api/blacklist/add", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: kind, value }),
+            });
+            const data = await response.json();
+            if (!data.ok) throw new Error(data.error || "Blacklist update failed");
+            state.blacklist = data.blacklist || state.blacklist;
+            renderBlacklistButton();
+            await loadJobs();
+          } catch (err) {
+            console.error("Blacklist add failed:", err);
+            btn.disabled = false;
+          }
+        });
       });
 
       tbody.querySelectorAll("button.role-copy").forEach((btn) => {
@@ -1108,6 +1437,8 @@ DASHBOARD_HTML = """<!doctype html>
 
         <div class="details-grid">
           <div class="meta"><div class="meta-label">Status</div><div class="meta-value">${esc(fmt(job.status))}</div></div>
+          <div class="meta"><div class="meta-label">Applied</div><div class="meta-value">${isApplied(job.applied) ? "Yes" : "No"}</div></div>
+          <div class="meta"><div class="meta-label">Flagged</div><div class="meta-value">${isFlagged(job.flagged) ? "Yes (useless)" : "No"}</div></div>
           <div class="meta"><div class="meta-label">Saved Date</div><div class="meta-value">${esc(fmt(job.scraped_at))}</div></div>
           <div class="meta"><div class="meta-label">Job Type</div><div class="meta-value">${esc(fmt(job.job_type))}</div></div>
           <div class="meta"><div class="meta-label">Salary</div><div class="meta-value">${esc(fmt(job.salary))}</div></div>
@@ -1191,12 +1522,140 @@ DASHBOARD_HTML = """<!doctype html>
       filterJobs();
     }
 
-    function exportJson() {
-      const blob = new Blob([JSON.stringify(state.filtered, null, 2)], { type: "application/json" });
+    async function loadBlacklist() {
+      try {
+        const response = await fetch("/api/blacklist");
+        const data = await response.json();
+        state.blacklist = data.blacklist || { companies: [], roles: [] };
+      } catch (err) {
+        console.error("Failed to load blacklist:", err);
+      }
+      renderBlacklistButton();
+      renderBlacklistModal();
+    }
+
+    function renderBlacklistButton() {
+      const btn = document.getElementById("blacklistBtn");
+      if (!btn) return;
+      const total = (state.blacklist.companies?.length || 0) + (state.blacklist.roles?.length || 0);
+      btn.textContent = `Blacklist (${total})`;
+    }
+
+    function renderBlacklistModal() {
+      const renderList = (containerId, countId, kind, items) => {
+        const container = document.getElementById(containerId);
+        const counter = document.getElementById(countId);
+        if (!container || !counter) return;
+        counter.textContent = items.length ? `(${items.length})` : "(none)";
+        if (!items.length) {
+          container.innerHTML = '<span class="bl-empty">Nothing blacklisted yet.</span>';
+          return;
+        }
+        container.innerHTML = items.map((value) => `
+          <span class="bl-chip">
+            <span>${esc(value)}</span>
+            <button type="button" data-bl-remove-kind="${esc(kind)}" data-bl-remove-value="${esc(value)}" aria-label="Remove">×</button>
+          </span>
+        `).join("");
+        container.querySelectorAll("button[data-bl-remove-kind]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const removeKind = btn.dataset.blRemoveKind;
+            const removeValue = btn.dataset.blRemoveValue;
+            btn.disabled = true;
+            try {
+              const response = await fetch("/api/blacklist/remove", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: removeKind, value: removeValue }),
+              });
+              const data = await response.json();
+              if (!data.ok) throw new Error(data.error || "Remove failed");
+              state.blacklist = data.blacklist || state.blacklist;
+              renderBlacklistButton();
+              renderBlacklistModal();
+            } catch (err) {
+              console.error("Blacklist remove failed:", err);
+              btn.disabled = false;
+            }
+          });
+        });
+      };
+      renderList("blCompanies", "blCompanyCount", "company", state.blacklist.companies || []);
+      renderList("blRoles", "blRoleCount", "role", state.blacklist.roles || []);
+    }
+
+    async function addBlacklistFromInput(kind) {
+      const inputId = kind === "company" ? "blCompanyInput" : "blRoleInput";
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const value = input.value.trim();
+      if (!value) return;
+      try {
+        const response = await fetch("/api/blacklist/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: kind, value }),
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || "Add failed");
+        state.blacklist = data.blacklist || state.blacklist;
+        input.value = "";
+        renderBlacklistButton();
+        renderBlacklistModal();
+        await loadJobs();
+      } catch (err) {
+        console.error("Blacklist add failed:", err);
+      }
+    }
+
+    function openBlacklistModal() {
+      document.getElementById("blacklistModal")?.classList.add("open");
+      document.getElementById("blacklistBackdrop")?.classList.add("open");
+      document.getElementById("blacklistModal")?.setAttribute("aria-hidden", "false");
+      renderBlacklistModal();
+    }
+
+    function closeBlacklistModal() {
+      document.getElementById("blacklistModal")?.classList.remove("open");
+      document.getElementById("blacklistBackdrop")?.classList.remove("open");
+      document.getElementById("blacklistModal")?.setAttribute("aria-hidden", "true");
+    }
+
+    const CSV_FIELDS = [
+      "job_title","company","location","job_type","salary","posted_date",
+      "description_summary","key_skills","contact_emails","email_apply_required",
+      "application_channel","apply_url","source_url","scraped_at","status","applied",
+    ];
+
+    function csvEscape(value) {
+      const s = value == null ? "" : String(value);
+      return /[",\\n\\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    function rowsToCsv(rows) {
+      const lines = [CSV_FIELDS.join(",")];
+      for (const row of rows) {
+        lines.push(CSV_FIELDS.map((f) => csvEscape(row[f])).join(","));
+      }
+      return lines.join("\\n") + "\\n";
+    }
+
+    function downloadCsv(rangeKey) {
+      let rows = state.jobs.filter((job) => job.status !== "blacklist");
+      let label = "all";
+      if (rangeKey !== "all") {
+        const days = Number(rangeKey);
+        if (!Number.isFinite(days)) return;
+        rows = rows.filter((job) => daysSince(job.scraped_at) <= days);
+        label = `last-${days}d`;
+      }
+      const csv = rowsToCsv(rows);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
+      const today = new Date().toISOString().slice(0, 10);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = "resume_scraper_jobs.json";
+      anchor.download = `resume_scraper_${label}_${today}.csv`;
       anchor.click();
       setTimeout(() => URL.revokeObjectURL(url), 300);
     }
@@ -1207,13 +1666,36 @@ DASHBOARD_HTML = """<!doctype html>
     document.getElementById("duplicateFilter").addEventListener("change", filterJobs);
     document.getElementById("sourceFilter").addEventListener("change", filterJobs);
     document.getElementById("daysFilter").addEventListener("change", filterJobs);
-    document.getElementById("refreshBtn").addEventListener("click", loadJobs);
-    document.getElementById("exportBtn").addEventListener("click", exportJson);
+    document.getElementById("refreshBtn").addEventListener("click", () => {
+      loadBlacklist();
+      loadJobs();
+    });
+    document.querySelectorAll("#downloadMenu button[data-download-days]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        downloadCsv(btn.dataset.downloadDays);
+        document.getElementById("downloadMenu").open = false;
+      });
+    });
+    document.addEventListener("click", (event) => {
+      const menu = document.getElementById("downloadMenu");
+      if (menu && menu.open && !menu.contains(event.target)) menu.open = false;
+    });
     document.getElementById("deleteBtn").addEventListener("click", bulkDelete);
+    document.getElementById("blacklistBtn").addEventListener("click", openBlacklistModal);
+    document.getElementById("blacklistCloseBtn").addEventListener("click", closeBlacklistModal);
+    document.getElementById("blacklistBackdrop").addEventListener("click", closeBlacklistModal);
+    document.getElementById("blCompanyAddBtn").addEventListener("click", () => addBlacklistFromInput("company"));
+    document.getElementById("blRoleAddBtn").addEventListener("click", () => addBlacklistFromInput("role"));
+    document.getElementById("blCompanyInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); addBlacklistFromInput("company"); }
+    });
+    document.getElementById("blRoleInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); addBlacklistFromInput("role"); }
+    });
     document.getElementById("drawerCloseBtn").addEventListener("click", closeDrawer);
     document.getElementById("drawerBackdrop").addEventListener("click", closeDrawer);
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeDrawer();
+      if (event.key === "Escape") { closeDrawer(); closeBlacklistModal(); }
     });
 
     document.getElementById("checkAll").addEventListener("change", (event) => {
@@ -1241,9 +1723,10 @@ DASHBOARD_HTML = """<!doctype html>
       });
     });
 
+    loadBlacklist();
     loadJobs().catch((error) => {
       document.getElementById("jobsBody").innerHTML =
-        `<tr><td colspan="4" class="empty">Failed to load jobs: ${esc(error.message)}</td></tr>`;
+        `<tr><td colspan="6" class="empty">Failed to load jobs: ${esc(error.message)}</td></tr>`;
     });
   </script>
 </body>
@@ -1431,7 +1914,118 @@ def normalize_job_payload(job: dict[str, Any]) -> dict[str, str]:
             "status": str(job.get("status", "saved")).strip() or "saved",
         }
     )
+    raw_applied = str(job.get("applied", "")).strip().lower()
+    raw_flagged = str(job.get("flagged", "")).strip().lower()
+    if raw_applied == "flagged":
+        raw_applied = ""
+        if raw_flagged not in FLAGGED_VALUES or not raw_flagged:
+            raw_flagged = "yes"
+    normalized["applied"] = raw_applied if raw_applied in APPLIED_VALUES else ""
+    normalized["flagged"] = raw_flagged if raw_flagged in FLAGGED_VALUES else ""
     return normalized
+
+
+def _normalize_company_key(value: str) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip()).lower()
+
+
+def _normalize_role_key(value: str) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip()).lower()
+
+
+def load_blacklist() -> dict[str, list[str]]:
+    ensure_storage()
+    if not BLACKLIST_FILE.exists():
+        return {"companies": [], "roles": []}
+    try:
+        raw = json.loads(BLACKLIST_FILE.read_text(encoding="utf-8"))
+    except (ValueError, json.JSONDecodeError):
+        return {"companies": [], "roles": []}
+    companies = [str(v).strip() for v in raw.get("companies", []) if str(v).strip()]
+    roles = [str(v).strip() for v in raw.get("roles", []) if str(v).strip()]
+    return {"companies": companies, "roles": roles}
+
+
+def save_blacklist(data: dict[str, list[str]]) -> None:
+    ensure_storage()
+    BLACKLIST_FILE.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def is_blacklisted(company: str, job_title: str, blacklist: dict[str, list[str]] | None = None) -> bool:
+    bl = blacklist if blacklist is not None else load_blacklist()
+    company_key = _normalize_company_key(company)
+    if company_key:
+        for entry in bl.get("companies", []):
+            if _normalize_company_key(entry) == company_key:
+                return True
+    title_lower = str(job_title or "").lower()
+    if title_lower:
+        for entry in bl.get("roles", []):
+            needle = _normalize_role_key(entry)
+            if needle and needle in title_lower:
+                return True
+    return False
+
+
+def add_blacklist_entry(kind: str, value: str) -> dict[str, Any]:
+    if kind not in {"company", "role"}:
+        return {"ok": False, "error": "Invalid blacklist type"}
+    cleaned = str(value or "").strip()
+    if not cleaned:
+        return {"ok": False, "error": "Empty value"}
+
+    bl = load_blacklist()
+    bucket = "companies" if kind == "company" else "roles"
+    normalize = _normalize_company_key if kind == "company" else _normalize_role_key
+    target = normalize(cleaned)
+    existing = {normalize(v) for v in bl[bucket]}
+    if target not in existing:
+        bl[bucket].append(cleaned)
+        save_blacklist(bl)
+
+    retagged = sweep_blacklist_status(bl)
+    return {"ok": True, "blacklist": bl, "retagged": retagged}
+
+
+def remove_blacklist_entry(kind: str, value: str) -> dict[str, Any]:
+    if kind not in {"company", "role"}:
+        return {"ok": False, "error": "Invalid blacklist type"}
+    cleaned = str(value or "").strip()
+    if not cleaned:
+        return {"ok": False, "error": "Empty value"}
+
+    bl = load_blacklist()
+    bucket = "companies" if kind == "company" else "roles"
+    normalize = _normalize_company_key if kind == "company" else _normalize_role_key
+    target = normalize(cleaned)
+    bl[bucket] = [v for v in bl[bucket] if normalize(v) != target]
+    save_blacklist(bl)
+    return {"ok": True, "blacklist": bl}
+
+
+def sweep_blacklist_status(blacklist: dict[str, list[str]] | None = None) -> int:
+    """Re-tag existing CSV rows whose company/role match the blacklist."""
+    bl = blacklist if blacklist is not None else load_blacklist()
+    retagged = 0
+    for path in list_csv_files():
+        ensure_csv_schema(path)
+        with path.open("r", newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            rows = list(reader)
+        changed = False
+        for row in rows:
+            if is_blacklisted(row.get("company", ""), row.get("job_title", ""), bl):
+                if (row.get("status") or "").strip().lower() != "blacklist":
+                    row["status"] = "blacklist"
+                    changed = True
+                    retagged += 1
+        if changed:
+            with path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
+                writer.writeheader()
+                for row in rows:
+                    writer.writerow(normalize_job_payload(row))
+    return retagged
 
 
 def save_job_index(index: dict[str, dict[str, str]]) -> None:
@@ -1457,6 +2051,8 @@ def rebuild_job_index() -> dict[str, dict[str, str]]:
                     "location": normalized["location"],
                     "source_url": normalized["source_url"],
                     "scraped_at": normalized["scraped_at"],
+                    "applied": normalized.get("applied", ""),
+                    "flagged": normalized.get("flagged", ""),
                 }
     save_job_index(index)
     return index
@@ -1499,6 +2095,10 @@ def append_job_to_csv(job: dict[str, str], path: Path) -> None:
 
 def store_job(job: dict[str, Any], allow_duplicate: bool = False) -> dict[str, Any]:
     normalized = normalize_job_payload(job)
+    if (normalized.get("status") or "saved").strip().lower() == "saved" and is_blacklisted(
+        normalized.get("company", ""), normalized.get("job_title", "")
+    ):
+        normalized["status"] = "blacklist"
     key = compute_job_key(normalized)
     index = load_job_index()
     existing = index.get(key)
@@ -1524,6 +2124,8 @@ def store_job(job: dict[str, Any], allow_duplicate: bool = False) -> dict[str, A
             "location": normalized["location"],
             "source_url": normalized["source_url"],
             "scraped_at": normalized["scraped_at"],
+            "applied": normalized.get("applied", ""),
+            "flagged": normalized.get("flagged", ""),
         }
         save_job_index(index)
 
@@ -1536,7 +2138,7 @@ def store_job(job: dict[str, Any], allow_duplicate: bool = False) -> dict[str, A
     }
 
 
-UPDATABLE_FIELDS = {"status"}
+UPDATABLE_FIELDS = {"status", "applied", "flagged"}
 
 
 def parse_row_id(row_id: str) -> tuple[Path, int] | None:
@@ -1567,8 +2169,18 @@ def update_job_row(row_id: str, updates: dict[str, Any]) -> dict[str, Any]:
 
     cleaned: dict[str, str] = {}
     for key, value in updates.items():
-        if key in UPDATABLE_FIELDS:
-            cleaned[key] = str(value).strip()
+        if key not in UPDATABLE_FIELDS:
+            continue
+        text = str(value).strip()
+        if key == "applied":
+            text = text.lower()
+            if text not in APPLIED_VALUES:
+                return {"ok": False, "error": f"Invalid applied value: {text!r}"}
+        elif key == "flagged":
+            text = text.lower()
+            if text not in FLAGGED_VALUES:
+                return {"ok": False, "error": f"Invalid flagged value: {text!r}"}
+        cleaned[key] = text
     if not cleaned:
         return {"ok": False, "error": "No updatable fields supplied"}
 
@@ -1588,6 +2200,9 @@ def update_job_row(row_id: str, updates: dict[str, Any]) -> dict[str, Any]:
         writer.writeheader()
         for row in rows:
             writer.writerow(normalize_job_payload(row))
+
+    if cleaned.keys() & {"applied", "flagged"}:
+        rebuild_job_index()
 
     return {"ok": True, "updated": cleaned}
 
@@ -1735,10 +2350,35 @@ class JobRequestHandler(BaseHTTPRequestHandler):
             self._send_json(200, {"ok": True, **build_dashboard_payload()})
             return
 
+        if parsed.path == "/api/blacklist":
+            self._send_json(200, {"ok": True, "blacklist": load_blacklist()})
+            return
+
+        if parsed.path == "/api/flagged":
+            index = load_job_index()
+            flagged = {
+                key: {
+                    "job_title": entry.get("job_title", ""),
+                    "company": entry.get("company", ""),
+                    "source_url": entry.get("source_url", ""),
+                    "scraped_at": entry.get("scraped_at", ""),
+                }
+                for key, entry in index.items()
+                if str(entry.get("flagged", "")).lower() == "yes"
+            }
+            self._send_json(200, {"ok": True, "flagged": flagged})
+            return
+
         self._send_json(404, {"ok": False, "error": "Not found"})
 
     def do_POST(self) -> None:
-        if self.path not in {"/api/jobs", "/api/jobs/update", "/api/jobs/delete"}:
+        if self.path not in {
+            "/api/jobs",
+            "/api/jobs/update",
+            "/api/jobs/delete",
+            "/api/blacklist/add",
+            "/api/blacklist/remove",
+        }:
             self._send_json(404, {"ok": False, "error": "Not found"})
             return
 
@@ -1764,6 +2404,18 @@ class JobRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"ok": False, "error": "Expected object payload"})
                 return
             result = delete_job_rows(payload.get("row_ids", []))
+            status_code = 200 if result.get("ok") else 400
+            self._send_json(status_code, {**result, "summary": build_dashboard_payload()["summary"]})
+            return
+
+        if self.path in {"/api/blacklist/add", "/api/blacklist/remove"}:
+            if not isinstance(payload, dict):
+                self._send_json(400, {"ok": False, "error": "Expected object payload"})
+                return
+            kind = str(payload.get("type", "")).strip().lower()
+            value = payload.get("value", "")
+            action = add_blacklist_entry if self.path.endswith("/add") else remove_blacklist_entry
+            result = action(kind, value)
             status_code = 200 if result.get("ok") else 400
             self._send_json(status_code, {**result, "summary": build_dashboard_payload()["summary"]})
             return

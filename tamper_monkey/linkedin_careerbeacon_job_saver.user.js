@@ -440,6 +440,10 @@
           <div style="font-size:14px;line-height:1.55;color:#9eb2d1;">
             This job already exists in <strong>${escapeHtml(existing.file || duplicateInfo.existing_file || "your job archive")}</strong>.
           </div>
+          ${existing.flagged === "yes" ? `
+          <div style="padding:14px;border-radius:14px;background:rgba(245,196,106,0.14);border:1px solid rgba(245,196,106,0.55);color:#f5c46a;font-size:14px;font-weight:600;line-height:1.45;">
+            ⚑ You flagged this job as useless previously. Reconsider before saving again.
+          </div>` : ""}
           <div style="padding:14px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(106,194,255,0.14);">
             <div style="font-size:16px;font-weight:700;">${escapeHtml(job.job_title)}</div>
             <div style="font-size:13px;color:#9eb2d1;margin-top:6px;">${escapeHtml(job.company)} • ${escapeHtml(job.location)}</div>

@@ -1,0 +1,10 @@
+services:
+  scraper:
+    build: .
+    image: resume-scraper:latest
+    container_name: resume-scraper
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./job_data:/app/job_data
+    restart: unless-stopped
