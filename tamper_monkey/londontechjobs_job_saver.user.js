@@ -420,7 +420,7 @@
       }
     } catch (error) {
       state.collectorOnline = false;
-      showToast("Local collector is offline. Run: python3 Scraper.py serve");
+      showToast("Local collector is offline. Run: python Scraper.py serve");
     } finally {
       state.saving = false;
       renderPanel();

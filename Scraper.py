@@ -54,26 +54,53 @@ DASHBOARD_HTML = """<!doctype html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Resume Scraper Dashboard</title>
+  <script>
+    // Match the embedding app's theme (passed as ?theme=light|dark); default dark.
+    (function () {
+      var p = new URLSearchParams(location.search).get('theme');
+      document.documentElement.setAttribute('data-theme', p === 'light' ? 'light' : 'dark');
+    })();
+  </script>
   <style>
+    /* Palette matched to the Resume Studio app (light default, dark via data-theme). */
     :root {
-      --bg: #08111f;
-      --bg-deep: #040913;
-      --panel: rgba(13, 21, 36, 0.82);
-      --panel-strong: rgba(18, 28, 47, 0.96);
-      --panel-soft: rgba(9, 16, 30, 0.7);
-      --ink: #eef4ff;
-      --muted: #8fa3c7;
-      --line: rgba(141, 175, 230, 0.14);
-      --accent: #45d0ff;
-      --accent-strong: #20b8f0;
-      --accent-soft: rgba(69, 208, 255, 0.12);
-      --warm: #ff8b5e;
-      --success: #3fe0ae;
-      --duplicate: #ff6f8d;
-      --shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
-      --radius: 24px;
-      --font-ui: "Avenir Next", "Segoe UI", sans-serif;
-      --font-display: "Iowan Old Style", "Georgia", serif;
+      --bg: #f4f6fa;
+      --bg-deep: #eef1f6;
+      --panel: #ffffff;
+      --panel-strong: #ffffff;
+      --panel-soft: #fafbfd;
+      --ink: #1a2230;
+      --muted: #6b7686;
+      --line: #e5e9f0;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --accent-soft: #e8f0fe;
+      --warm: #98a2b3;
+      --success: #157f44;
+      --duplicate: #c0392b;
+      --shadow: 0 1px 3px rgba(16,24,40,.06), 0 1px 2px rgba(16,24,40,.04);
+      --shadow-lg: 0 12px 40px rgba(16,24,40,.18);
+      --radius: 12px;
+      --font-ui: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-display: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    html[data-theme="dark"] {
+      --bg: #0e1422;
+      --bg-deep: #0a1120;
+      --panel: #161e2e;
+      --panel-strong: #1a2335;
+      --panel-soft: #111a2c;
+      --ink: #e7ecf4;
+      --muted: #9aa6b8;
+      --line: #27314a;
+      --accent: #3b82f6;
+      --accent-strong: #7eacff;
+      --accent-soft: #1d2c49;
+      --warm: #6f7c91;
+      --success: #4ade80;
+      --duplicate: #f87171;
+      --shadow: 0 1px 3px rgba(0,0,0,.45);
+      --shadow-lg: 0 14px 44px rgba(0,0,0,.55);
     }
 
     * { box-sizing: border-box; }
@@ -811,6 +838,50 @@ DASHBOARD_HTML = """<!doctype html>
       th:nth-child(5), td:nth-child(5),
       th:nth-child(6), td:nth-child(6) { display: none; }
     }
+
+    /* ===== Resume Studio look: flatten the bespoke glows/gradients/serif ===== */
+    body { background: var(--bg) !important; -webkit-font-smoothing: antialiased; }
+    body::before { display: none !important; }
+    .shell { max-width: 1240px; padding: 26px 30px; }
+    .card { backdrop-filter: none; box-shadow: var(--shadow); border-radius: 14px; }
+    .card:hover { border-color: var(--line); }
+    .hero { gap: 16px; margin-bottom: 16px; }
+    .hero-main, .hero-side, .stat, .table-wrap, .toolbar, .details, .meta, .summary-box {
+      background: var(--panel) !important; }
+    .hero-main::after, .stat::after { display: none !important; }
+    .hero-main { padding: 24px 26px; }
+    h1 { font-family: var(--font-ui); font-size: 26px; font-weight: 700;
+         letter-spacing: -.3px; line-height: 1.1; text-shadow: none; margin: 0 0 8px; }
+    .hero-copy { font-size: 14px; }
+    .eyebrow { color: var(--accent); letter-spacing: .14em; }
+    .stat { border-radius: 12px; }
+    .stat:hover { transform: none; box-shadow: var(--shadow); border-color: var(--accent); }
+    .stat-value { font-size: 24px; }
+    .field, .button, select { border-radius: 10px; }
+    .field, select { background: var(--panel); border: 1px solid var(--line); color: var(--ink); }
+    .field:focus, select:focus { border-color: var(--accent); outline: 0;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+    .button { background: var(--accent); color: #fff; border: 1px solid transparent;
+      box-shadow: var(--shadow); font-weight: 600; }
+    .button:hover { background: var(--accent-strong); transform: none; border-color: transparent; }
+    .button.secondary { background: var(--panel); color: var(--ink); border: 1px solid var(--line); }
+    .button.secondary:hover { background: var(--bg-deep); }
+    .button.danger { background: var(--duplicate); color: #fff; box-shadow: var(--shadow); }
+    .download-menu .menu-pop { background: var(--panel); box-shadow: var(--shadow-lg); }
+    th { background: var(--panel); }
+    tbody tr:hover, tbody tr.active { background: var(--accent-soft); transform: none;
+      box-shadow: inset 3px 0 0 var(--accent); }
+    .pill { background: var(--bg-deep); border: 1px solid var(--line); }
+    .pill.duplicate { color: var(--duplicate); background: #fdecea; border-color: #f3c0ba; }
+    html[data-theme="dark"] .pill.duplicate { background: #371a18; border-color: #5e2622; }
+    .status-select.is-saved, .status-select.is-applied {
+      color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+    .summary-box { background: var(--panel-soft) !important; border-radius: 12px; }
+    .meta { border-radius: 12px; }
+    .drawer { background: var(--panel) !important; box-shadow: var(--shadow-lg); }
+    .drawer-header, .details { background: var(--panel) !important; }
+    .modal { background: var(--panel); box-shadow: var(--shadow-lg); }
+    .details h2, .modal h2 { font-family: var(--font-ui); }
   </style>
 </head>
 <body>
@@ -1856,6 +1927,45 @@ def is_meaningful_job_url(url: str) -> bool:
     return any(token in path.lower() for token in ("viewjob", "job", "clk", "pagead"))
 
 
+# Query params that carry a genuine, stable job id on common platforms. These are
+# kept for keying; everything else in the query string is dropped so that volatile
+# tracking/navigation params (LinkedIn refId/trackingId, session tokens, etc.) can't
+# make the same job hash differently on every page refresh.
+PLATFORM_JOB_ID_KEYS = (
+    "currentjobid", "gh_jid", "jobid", "job_id", "posting_id",
+    "reqid", "req_id", "vacancyid", "position_id", "lever",
+)
+
+
+def extract_platform_job_id(url: str) -> str:
+    """Return 'host:id' if the URL carries a known stable job-id query param."""
+    parsed = urlparse(str(url or "").strip())
+    host = (parsed.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    lowered = {k.lower(): v for k, v in parse_qs(parsed.query).items()}
+    for key in PLATFORM_JOB_ID_KEYS:
+        values = lowered.get(key)
+        if values and values[0].strip():
+            return f"{host}:{values[0].strip()}"
+    return ""
+
+
+def canonical_path_url(url: str) -> str:
+    """host + path only (query and fragment dropped) for stable URL-based keying.
+
+    Most ATS/job boards encode the job id in the path, so this is stable across
+    refreshes. Cases where the id lives in the query are handled first by
+    extract_platform_job_id(); the fingerprint fallback covers everything else.
+    """
+    parsed = urlparse(str(url or "").strip())
+    host = (parsed.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    path = re.sub(r"/+$", "", parsed.path)
+    return f"{host}{path}".lower()
+
+
 def compute_job_key(job: dict[str, Any]) -> str:
     source_url = str(job.get("source_url", "")).strip()
     apply_url = str(job.get("apply_url", "")).strip()
@@ -1865,11 +1975,14 @@ def compute_job_key(job: dict[str, Any]) -> str:
         if indeed_id:
             return f"jk:{indeed_id}"
 
-    if source_url and is_meaningful_job_url(source_url):
-        return f"url:{clean_job_url(source_url)}"
+    for candidate in (source_url, apply_url):
+        platform_id = extract_platform_job_id(candidate)
+        if platform_id:
+            return f"pid:{platform_id}"
 
-    if apply_url and not apply_url.lower().startswith("mailto:") and is_meaningful_job_url(apply_url):
-        return f"url:{clean_job_url(apply_url)}"
+    for candidate in (source_url, apply_url):
+        if candidate and not candidate.lower().startswith("mailto:") and is_meaningful_job_url(candidate):
+            return f"url:{canonical_path_url(candidate)}"
 
     title = normalize_text(str(job.get("job_title", "")))
     company = normalize_text(str(job.get("company", "")))
@@ -2482,7 +2595,7 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
         return serve_mode(host=host, port=port)
 
-    print("Usage: python3 Scraper.py serve [host] [port]")
+    print("Usage: python Scraper.py serve [host] [port]")
     return 1
 
 
